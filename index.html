@@ -46,21 +46,39 @@
           <div><strong>L1 / L2</strong><span>Support &amp; engineering</span></div>
         </div>
       </div>
-      <div class="network-visual" aria-label="Abstract network topology">
-        <div class="visual-label mono">LIVE / NETWORK MAP</div>
+      <div class="network-visual" aria-label="Live airport network operations map">
+        <div class="visual-head"><div class="visual-label mono"><span class="live-bars"><i></i><i></i><i></i></span> LIVE / NETWORK MAP</div><span class="visual-clock mono">00:00:24 <b>UTC</b></span></div>
         <div class="topology">
-          <div class="node node-core"><span class="node-icon">◈</span><b>CORE</b><small>10.0.0.1</small></div>
-          <div class="node node-edge"><span class="node-icon">◇</span><b>EDGE</b><small>OSPF / BGP</small></div>
-          <div class="node node-secure"><span class="node-icon">⌾</span><b>SECURITY</b><small>HA FIREWALL</small></div>
-          <div class="node node-wireless"><span class="node-icon">◌</span><b>WIRELESS</b><small>RUCKUS AP</small></div>
+          <div class="node node-core"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/><circle cx="16" cy="16" r="1"/></svg></span><b>CORE SWITCH</b><small>10.0.0.1 · L3</small><i class="node-state"></i></div>
+          <div class="node node-edge"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17h16M7 17V9l5-4 5 4v8M9 13h6M12 5v3"/></svg></span><b>EDGE ROUTER</b><small>OSPF / BGP</small><i class="node-state"></i></div>
+          <div class="node node-secure"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><b>FIREWALL HA</b><small>SOPHOS · ACTIVE</small><i class="node-state"></i></div>
+          <div class="node node-wireless"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5a12 12 0 0 1 16 0M7 14a7.5 7.5 0 0 1 10 0M10 17.5a3 3 0 0 1 4 0"/><circle cx="12" cy="20" r="1"/></svg></span><b>WIRELESS</b><small>RUCKUS · 55 AP</small><i class="node-state"></i></div>
+          <div class="node node-server"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="6" rx="1"/><rect x="4" y="14" width="16" height="6" rx="1"/><path d="M7 7h.1M7 17h.1M10 7h7M10 17h7"/></svg></span><b>SERVER FARM</b><small>AD · LINUX · WIN</small><i class="node-state"></i></div>
+          <div class="node node-alert"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3L12 4Z"/><path d="M12 9v5M12 17h.1"/></svg></span><b>FIDS / CCTV</b><small>PACKET LOSS 2%</small><i class="node-state"></i></div>
           <svg viewBox="0 0 500 430" role="presentation">
-            <path class="route route-main" d="M250 210 L100 88 M250 210 L400 88 M250 210 L130 350 M250 210 L390 350" />
-            <path class="route route-dash" d="M100 88 L400 88 M130 350 L390 350" />
-            <circle class="signal" cx="250" cy="210" r="7" />
-            <circle class="signal signal-two" cx="250" cy="210" r="7" />
+            <path class="route route-main" d="M250 210 L100 88 M250 210 L400 88 M250 210 L130 350 M250 210 L380 350" />
+            <path class="route route-fiber route-fiber-two" d="M100 88 L400 88 M100 88 L130 350 M400 88 L380 350 M130 350 L380 350" />
+            <path class="route route-dash" d="M100 88 L250 210 M400 88 L250 210" />
+            <circle class="signal" cx="250" cy="210" r="7" /><circle class="signal signal-two" cx="250" cy="210" r="7" />
+            <circle class="packet packet-a" r="4"><animateMotion dur="3.2s" repeatCount="indefinite" path="M0 0 L-150 -122"/></circle>
+            <circle class="packet packet-b" r="4"><animateMotion dur="3.8s" begin="1s" repeatCount="indefinite" path="M0 0 L150 -122"/></circle>
+            <circle class="packet packet-c" r="4"><animateMotion dur="4.5s" begin=".5s" repeatCount="indefinite" path="M0 0 L-120 140"/></circle>
+            <circle class="packet packet-d" r="3"><animateMotion dur="5s" begin="1.4s" repeatCount="indefinite" path="M-150 -122 L150 -122"/></circle>
+            <circle class="packet packet-e" r="3"><animateMotion dur="5.6s" begin="2s" repeatCount="indefinite" path="M-120 140 L130 140"/></circle>
           </svg>
         </div>
-        <div class="visual-footer mono"><span><i></i> All systems nominal</span><span>AYD / INDIA</span></div>
+        <div class="skill-web" aria-label="Network engineering skills">
+          <span class="skill-node skill-core">SOHIT / ENGINEER</span>
+          <span class="skill-node skill-one">CISCO IOS</span>
+          <span class="skill-node skill-two">VLAN / STP</span>
+          <span class="skill-node skill-three">IPSEC VPN</span>
+          <span class="skill-node skill-four">LINUX / SSH</span>
+          <span class="skill-node skill-five">AD / GPO</span>
+          <span class="skill-node skill-six">WIRESHARK</span>
+          <span class="skill-node skill-seven">PYTHON / NETMIKO</span>
+          <i class="web-link web-link-a"></i><i class="web-link web-link-b"></i><i class="web-link web-link-c"></i><i class="web-link web-link-d"></i>
+        </div>
+        <div class="visual-footer mono"><span><i></i> All systems nominal</span><span>AYD / INDIA</span><span>LATENCY <b>2.4ms</b></span></div>
       </div>
     </section>
 
