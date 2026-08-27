@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio of Sohit Vishwakarma — Network & IT Infrastructure Engineer." />
+  <title>Sohit Vishwakarma | Network Infrastructure Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Sohit Vishwakarma home">
+      <span class="brand-mark">SV<span class="pulse-dot"></span></span>
+      <span class="brand-name">Sohit Vishwakarma</span>
+    </a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#work">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="header-cta" href="mailto:isohitv@gmail.com">Let's connect <span>↗</span></a>
+    <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  </header>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <main id="top">
+    <section class="hero section-shell">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="status-dot"></span> Available for immediate joining</div>
+        <h1>Keeping critical systems<br /><em>quietly online.</em></h1>
+        <p class="hero-lede">Network &amp; IT Infrastructure Engineer controlling, monitoring and troubleshooting the full technology stack behind a live airport — from Cisco IOS and firewalls to servers, hardware and passenger-facing systems.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#work">Explore my work <span>↓</span></a>
+          <a class="text-link" href="mailto:isohitv@gmail.com">isohitv@gmail.com <span>↗</span></a>
+        </div>
+        <div class="quick-facts">
+          <div><strong>2.5+</strong><span>Years in IT</span></div>
+          <div><strong>99%+</strong><span>Uptime maintained</span></div>
+          <div><strong>L1 / L2</strong><span>Support &amp; engineering</span></div>
+        </div>
+      </div>
+      <div class="network-visual" aria-label="Abstract network topology">
+        <div class="visual-label mono">LIVE / NETWORK MAP</div>
+        <div class="topology">
+          <div class="node node-core"><span class="node-icon">◈</span><b>CORE</b><small>10.0.0.1</small></div>
+          <div class="node node-edge"><span class="node-icon">◇</span><b>EDGE</b><small>OSPF / BGP</small></div>
+          <div class="node node-secure"><span class="node-icon">⌾</span><b>SECURITY</b><small>HA FIREWALL</small></div>
+          <div class="node node-wireless"><span class="node-icon">◌</span><b>WIRELESS</b><small>RUCKUS AP</small></div>
+          <svg viewBox="0 0 500 430" role="presentation">
+            <path class="route route-main" d="M250 210 L100 88 M250 210 L400 88 M250 210 L130 350 M250 210 L390 350" />
+            <path class="route route-dash" d="M100 88 L400 88 M130 350 L390 350" />
+            <circle class="signal" cx="250" cy="210" r="7" />
+            <circle class="signal signal-two" cx="250" cy="210" r="7" />
+          </svg>
+        </div>
+        <div class="visual-footer mono"><span><i></i> All systems nominal</span><span>AYD / INDIA</span></div>
+      </div>
+    </section>
+
+    <section class="logo-strip section-shell">
+      <span class="mono">FIELD NOTES FROM THE STACK</span>
+      <div class="stack-list"><span>CISCO</span><span>RUCKUS</span><span>SOPHOS</span><span>FORTINET</span><span>ZABBIX</span><span>AWS</span></div>
+    </section>
+
+    <section class="about section-shell section-grid" id="about">
+      <div class="section-intro"><span class="section-number">01</span><h2>Operations-minded.<br /><em>Systems-curious.</em></h2></div>
+      <div class="about-copy">
+        <p class="large-copy">I work at the intersection of <strong>network reliability</strong>, security, and human support. My focus is simple: understand the whole system, solve the root cause, and leave the environment stronger than I found it.</p>
+        <p>Currently, I manage airport network infrastructure at Maharishi Valmiki International Airport, Ayodhya Dham — a 24/7 aviation environment with zero tolerance for downtime. From Cisco switching to Sophos HA firewalls and 300+ cameras, I keep the connected experience moving.</p>
+        <a class="text-link" href="#experience">More about my experience <span>↓</span></a>
+      </div>
+    </section>
+
+    <section class="metrics section-shell">
+      <div class="metric"><b>300<span>+</span></b><span>Honeywell CCTV<br />cameras</span></div>
+      <div class="metric"><b>55<span>+</span></b><span>Ruckus wireless<br />access points</span></div>
+      <div class="metric"><b>20<span>+</span></b><span>Cisco Catalyst<br />switches</span></div>
+      <div class="metric"><b>24/7</b><span>Mission-critical<br />NOC operations</span></div>
+    </section>
+
+    <section class="expertise section-shell" id="expertise">
+      <div class="section-heading"><div><span class="section-number">02A</span><h2>Engineering<br /><em>specialties.</em></h2></div><span class="mono muted">CORE CAPABILITIES</span></div>
+      <div class="expertise-grid">
+        <article class="expertise-card"><div class="expertise-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h8M8 15h5"/></svg></div><span class="mono">01 / ROUTING</span><h3>Switching &amp; Routing</h3><p>Designing stable L2/L3 networks with VLANs, trunks, STP/RSTP, inter-VLAN routing, OSPF and BGP fundamentals.</p><div class="expertise-meter"><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="expertise-card"><div class="expertise-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div><span class="mono">02 / SECURITY</span><h3>Firewall &amp; VPN</h3><p>Administering Sophos HA and FortiGate environments with secure NAT, ACL, IPS, IPsec and SSL VPN policies.</p><div class="expertise-meter"><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="expertise-card"><div class="expertise-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18V9M12 18V5M19 18v-6"/><path d="M3 18h18"/></svg></div><span class="mono">03 / NOC</span><h3>Monitoring &amp; NOC</h3><p>Running 24/7 operations with Infron NMS, Zabbix and Wireshark to reduce noise, find root causes and protect uptime.</p><div class="expertise-meter"><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="expertise-card"><div class="expertise-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7 4 12l4 5M16 7l4 5-4 5M14 4l-4 16"/></svg></div><span class="mono">04 / AUTOMATION</span><h3>Automation &amp; Systems</h3><p>Building practical Python, Netmiko, NAPALM, Ansible and PowerShell workflows for repeatable infrastructure work.</p><div class="expertise-meter"><i></i><i></i><i></i><i></i><i class="off"></i></div></article>
+        <article class="expertise-card"><div class="expertise-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="13" rx="1"/><path d="M8 21h8M12 18v3M7 9l2 2-2 2M11 13h4"/></svg></div><span class="mono">05 / ENDPOINTS</span><h3>Linux, Windows &amp; CLI</h3><p>Administering Ubuntu/CentOS and Windows Server through SSH, Bash, PowerShell, AD, event logs and Cisco IOS command line.</p><div class="expertise-meter"><i></i><i></i><i></i><i></i><i></i></div></article>
+      </div>
+    </section>
+
+    <section class="airport-ops section-shell">
+      <div class="section-heading"><div><span class="section-number">02B</span><h2>Airport<br /><em>operations.</em></h2></div><span class="mono muted">SYSTEMS I SUPPORT END-TO-END</span></div>
+      <div class="ops-panel">
+        <div class="ops-header mono"><span><i></i> AYODHYA / MVI</span><span>OPERATIONAL TECHNOLOGY MAP</span><span class="ops-live">● LIVE SUPPORT</span></div>
+        <div class="ops-grid">
+          <div class="ops-item"><span class="ops-icon">⌁</span><div><b>Network infrastructure</b><small>Cisco switches · VLANs · OSPF · Ruckus Wi-Fi</small></div><em>ONLINE</em></div>
+          <div class="ops-item"><span class="ops-icon">▣</span><div><b>Security &amp; access</b><small>Sophos HA · VPN · IDS/IPS · access control</small></div><em>ONLINE</em></div>
+          <div class="ops-item"><span class="ops-icon">◉</span><div><b>Surveillance systems</b><small>300+ Honeywell CCTV cameras · monitoring</small></div><em>ONLINE</em></div>
+          <div class="ops-item"><span class="ops-icon">▤</span><div><b>Passenger operations</b><small>FIDS · public address · operational displays</small></div><em>ONLINE</em></div>
+          <div class="ops-item"><span class="ops-icon">⌘</span><div><b>Servers &amp; directory</b><small>Linux · Windows Server · Active Directory</small></div><em>ONLINE</em></div>
+          <div class="ops-item"><span class="ops-icon">⌕</span><div><b>Monitoring &amp; response</b><small>Infron NMS · logs · Wireshark · RCA</small></div><em>24 / 7</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="experience section-shell" id="experience">
+      <div class="section-heading"><div><span class="section-number">03</span><h2>Where I’ve made<br /><em>an impact.</em></h2></div><span class="mono muted">2023 — PRESENT</span></div>
+      <div class="timeline">
+        <article class="role featured-role">
+          <div class="role-date mono">SEP 2024 — PRESENT</div>
+          <div class="role-body"><h3>IT Engineer <span>— L1/L2 Network &amp; Infrastructure</span></h3><p class="company">SK Integrated Consultants · Maharishi Valmiki International Airport, Ayodhya Dham</p><div class="airport-badges"><span>✦ LIVE AIRPORT NETWORK</span><span>◉ ZERO-DOWNTIME ENVIRONMENT</span></div><ul><li>Manage 20+ Cisco L2/L3 switches, 55+ Ruckus APs and Sophos Active/Standby HA across operational airport zones.</li><li>Maintain 99%+ uptime for FIDS, CCTV, access control and public address systems through proactive NOC monitoring.</li><li>Diagnose L2/L3 faults with Wireshark and lead incident response, RCA and escalation in a zero-downtime environment.</li></ul></div>
+          <div class="role-tag">CURRENT ROLE</div>
+        </article>
+        <article class="role">
+          <div class="role-date mono">MAY 2024 — SEP 2024</div>
+          <div class="role-body"><h3>Analyst <span>— Application Support</span></h3><p class="company">Wipro Limited · Hyderabad, India</p><p>Resolved 50+ backend incidents per month with 95%+ SLA adherence, working across production, DevOps and QA teams.</p></div>
+        </article>
+        <article class="role">
+          <div class="role-date mono">DEC 2023 — MAY 2024</div>
+          <div class="role-body"><h3>Software Developer Intern</h3><p class="company">Arivani Technologies · Lucknow, India</p><p>Built and deployed database-driven web applications and contributed to a live React 360° virtual tour product.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="work section-shell" id="work">
+      <div class="section-heading"><div><span class="section-number">04</span><h2>Selected<br /><em>field work.</em></h2></div><a class="text-link" href="https://github.com/SOHITVISH" target="_blank" rel="noreferrer">View GitHub <span>↗</span></a></div>
+      <div class="project-filters" role="group" aria-label="Filter projects"><button class="filter active" data-filter="all">All work</button><button class="filter" data-filter="infrastructure">Infrastructure</button><button class="filter" data-filter="automation">Automation</button><button class="filter" data-filter="observability">Observability</button></div>
+      <div class="project-grid">
+        <article class="project-card project-main reveal" data-category="infrastructure"><div class="card-top mono"><span>01 / DEPLOYMENT</span><span>2024—25</span></div><div class="project-art airport-art"><div class="radar"></div><span class="art-label mono">MVI / AYD</span><div class="tower"></div><div class="runway"></div></div><div class="project-content"><h3>MVI Airport IT &amp; Network Infrastructure</h3><p>End-to-end deployment and commissioning of a live international airport network, from structured cabling to FIDS go-live.</p><div class="tags"><span>Infrastructure</span><span>Network Design</span><span>Security</span></div></div></article>
+        <article class="project-card reveal" data-category="automation"><div class="card-top mono"><span>02 / AUTOMATION</span><span>LAB</span></div><div class="project-art code-art"><div class="code-lines mono"><span><i>01</i> connect(device)</span><span><i>02</i> backup_config()</span><span><i>03</i> verify_ospf()</span><span><i>04</i> <b>status: OK</b></span></div></div><div class="project-content"><h3>Cisco Routing &amp; Automation Lab</h3><p>EVE-NG lab with OSPF, VLANs and pfSense. Netmiko automation saves 4+ hours per week.</p><div class="tags"><span>Python</span><span>Netmiko</span><span>EVE-NG</span></div></div></article>
+        <article class="project-card reveal" data-category="observability"><div class="card-top mono"><span>03 / OBSERVABILITY</span><span>LAB</span></div><div class="project-art chart-art"><div class="chart-grid"></div><svg viewBox="0 0 400 160"><polyline points="0,120 55,105 90,122 135,65 180,82 230,40 270,65 320,24 400,44" /></svg><span class="chart-value mono">99.98% uptime</span></div><div class="project-content"><h3>Network Monitoring Lab</h3><p>Zabbix dashboards and SNMP alerts for CPU, memory and interface utilization across network devices.</p><div class="tags"><span>Zabbix</span><span>SNMP</span><span>NMS</span></div></div></article>
+      </div>
+      <div class="case-study">
+        <div class="case-copy"><span class="mono case-kicker">CASE STUDY / 01</span><h3>Commissioning a connected airport from the ground up.</h3><p>The MVI deployment brought together wired, wireless, security and operational systems into one documented, monitorable environment ready for live international operations.</p><div class="case-columns"><div><span class="mono">SCOPE</span><p>Structured cabling · Cisco switching · Ruckus wireless · Sophos HA · NMS · AD · CCTV · FIDS</p></div><div><span class="mono">OUTCOME</span><p>20+ switches and 55+ APs commissioned with 99%+ operational uptime and proactive incident visibility.</p></div></div></div>
+        <div class="architecture" aria-label="Sanitized airport network architecture diagram"><div class="arch-zone arch-internet">WAN / ISP</div><div class="arch-line line-a"></div><div class="arch-zone arch-firewall">SOPHOS<br /><small>HA PAIR</small></div><div class="arch-line line-b"></div><div class="arch-zone arch-core">CISCO CORE<br /><small>L3 / OSPF</small></div><div class="arch-branches"><span>VLANs</span><span>RUCKUS APs</span><span>FIDS / CCTV</span></div><div class="arch-caption mono">SANITIZED TOPOLOGY / NO LIVE DATA</div></div>
+      </div>
+    </section>
+
+    <section class="toolkit section-shell section-grid">
+      <div class="section-intro"><span class="section-number">05</span><h2>The<br /><em>toolkit.</em></h2></div>
+      <div class="toolkit-list"><div class="tool-group"><span class="mono">NETWORKING</span><p>Cisco IOS · OSPF · BGP · VLANs · STP/RSTP · TCP/IP · Ruckus Wireless</p></div><div class="tool-group"><span class="mono">SECURITY</span><p>Sophos HA · FortiGate · IPsec / SSL VPN · IDS/IPS · ACL · NAT · Zero Trust</p></div><div class="tool-group"><span class="mono">AUTOMATION &amp; CLOUD</span><p>Python · Netmiko · NAPALM · Ansible · Bash · AWS VPC · Git · REST APIs</p></div><div class="tool-group"><span class="mono">SYSTEMS &amp; OBSERVABILITY</span><p>Linux · Windows Server · Active Directory · Wireshark · Zabbix · SolarWinds</p></div><div class="network-console"><div class="console-head mono"><span><i></i><i></i><i></i></span><span>sohit@network:~</span><span>● LIVE</span></div><div class="console-output mono" aria-live="polite">Select a command to inspect my approach.</div><div class="console-actions"><button data-command="uptime">show uptime</button><button data-command="stack">show stack</button><button data-command="approach">show approach</button></div></div></div>
+    </section>
+
+    <section class="approach section-shell section-grid">
+      <div class="section-intro"><span class="section-number">06</span><h2>Calm under<br /><em>pressure.</em></h2></div>
+      <div class="approach-copy"><p class="large-copy">Good operations are repeatable. I use a structured incident workflow that turns noisy alerts into clear actions and durable fixes.</p><div class="workflow"><div><b>01</b><span>Detect</span><small>NMS alert / user report</small></div><div><b>02</b><span>Isolate</span><small>Scope the blast radius</small></div><div><b>03</b><span>Analyze</span><small>Logs / packet capture</small></div><div><b>04</b><span>Resolve</span><small>Restore service safely</small></div><div><b>05</b><span>Prevent</span><small>RCA / documentation</small></div></div></div>
+    </section>
+
+    <section class="certifications section-shell">
+      <div class="section-heading"><div><span class="section-number">07</span><h2>Learning with<br /><em>intent.</em></h2></div><span class="mono muted">CERTIFICATIONS &amp; EDUCATION</span></div>
+      <div class="cert-grid"><div class="cert-card cert-highlight"><span class="cert-badge">S</span><div><h3>Sophos Certified Network Engineer</h3><p>Sophos · 2025</p></div><span class="cert-arrow">↗</span></div><div class="cert-card"><span class="cert-badge">F</span><div><h3>FortiGate Administrator</h3><p>Fortinet · 2026</p></div><span class="cert-arrow">↗</span></div><div class="cert-card"><span class="cert-badge">CC</span><div><h3>CCNA: Networking, Switching, Addressing &amp; Routing</h3><p>Logical Operations · In progress</p></div><span class="cert-arrow">↗</span></div><div class="cert-card"><span class="cert-badge">B.Tech</span><div><h3>Computer Science Engineering</h3><p>Integral University · GPA 7.8</p></div><span class="cert-arrow">↗</span></div></div>
+    </section>
+
+    <section class="contact section-shell" id="contact"><div class="contact-inner"><span class="section-number">07</span><h2>Let’s build something<br /><em>resilient.</em></h2><p>Have a network challenge, infrastructure role, or just want to talk shop? My inbox is open.</p><a class="button button-primary" href="mailto:isohitv@gmail.com?subject=Network%20Infrastructure%20Opportunity%20-%20Portfolio&body=Hi%20Sohit%2C%0A%0AI%20found%20your%20portfolio%20and%20would%20like%20to%20connect%20about%20a%20network%20infrastructure%20opportunity.">Start a conversation <span>↗</span></a><a class="contact-email" href="mailto:isohitv@gmail.com">isohitv@gmail.com</a></div><div class="contact-aside mono"><span>LUCKNOW, INDIA</span><span>OPEN TO RELOCATION</span><a href="https://linkedin.com/in/sohit-vishwakarma" target="_blank" rel="noreferrer">LINKEDIN ↗</a><a href="https://github.com/SOHITVISH" target="_blank" rel="noreferrer">GITHUB ↗</a></div></section>
+  </main>
+  <section class="packet-game section-shell" aria-labelledby="game-title">
+    <div class="game-heading"><span class="section-number">08 / QUICK LAB</span><h2 id="game-title">Route the <em>packet.</em></h2><p>Put the network path in order. Click each hop from client to server.</p></div>
+    <div class="game-shell">
+      <div class="game-top mono"><span>PACKET: <b>SV-01</b></span><span>HOPS <b id="game-progress">0 / 4</b></span><span>STATUS <b id="game-status">AWAITING ROUTE</b></span></div>
+      <div class="game-track" id="game-track">
+        <button class="game-node endpoint" data-hop="0"><span>◉</span><small>CLIENT</small></button>
+        <button class="game-node" data-hop="1"><span>◇</span><small>SWITCH</small></button>
+        <button class="game-node" data-hop="2"><span>⌾</span><small>FIREWALL</small></button>
+        <button class="game-node" data-hop="3"><span>◌</span><small>ROUTER</small></button>
+        <button class="game-node endpoint" data-hop="4"><span>▣</span><small>SERVER</small></button>
+        <div class="game-line"></div>
+      </div>
+      <div class="game-bottom"><span class="mono" id="game-message" aria-live="polite">Click CLIENT to begin the route.</span><button class="game-reset" id="game-reset" type="button">Reset route ↻</button></div>
+    </div>
+  </section>
+  <footer class="site-footer section-shell"><span>© 2026 SOHIT VISHWAKARMA</span><span class="mono">BUILT FOR UPTIME <i></i></span></footer>
+  <script src="script.js"></script>
+</body>
+</html>
