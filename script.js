@@ -1,5 +1,67 @@
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.desktop-nav');
+const siteCursorLayer = document.querySelector('.site-cursor-layer');
+const cursorCable = document.querySelector('.cursor-cable');
+const cursorFiber = document.querySelector('.cursor-fiber');
+const cursorRJ45 = document.querySelector('.cursor-rj45');
+const cursorCablePath = document.querySelector('.cursor-cable-path');
+const cursorCableGlow = document.querySelector('.cursor-cable-glow');
+
+if (siteCursorLayer && cursorCable && cursorFiber && cursorRJ45 && cursorCablePath && cursorCableGlow) {
+  const syncCableViewport = () => {
+    cursorCable.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
+  };
+
+  let lastX = window.innerWidth * 0.5;
+  let lastY = window.innerHeight * 0.82;
+
+  const deactivate = () => {
+    siteCursorLayer.classList.remove('is-active');
+  };
+
+  const resetPath = () => {
+    syncCableViewport();
+    const x = window.innerWidth * 0.5;
+    const y = window.innerHeight * 0.82;
+    const pathData = `M ${x} ${y} C ${x + 80} ${y - 118}, ${x + 140} ${y - 70}, ${x + 42} ${y - 18}`;
+    cursorCablePath.setAttribute('d', pathData);
+    cursorCableGlow.setAttribute('d', pathData);
+  };
+
+  const updateCable = (event) => {
+    siteCursorLayer.classList.add('is-active');
+    syncCableViewport();
+
+    const targetX = Math.min(Math.max(event.clientX, 0), window.innerWidth);
+    const targetY = Math.min(Math.max(event.clientY, 0), window.innerHeight);
+
+    const smoothX = lastX + (targetX - lastX) * 0.17;
+    const smoothY = lastY + (targetY - lastY) * 0.17;
+    lastX = smoothX;
+    lastY = smoothY;
+
+    const anchorX = window.innerWidth * 0.28;
+    const anchorY = window.innerHeight * 0.82;
+    const dx = smoothX - anchorX;
+    const dy = smoothY - anchorY;
+
+    cursorFiber.style.setProperty('--x', `${smoothX}px`);
+    cursorFiber.style.setProperty('--y', `${smoothY}px`);
+    cursorRJ45.style.setProperty('--x', `${smoothX - 10}px`);
+    cursorRJ45.style.setProperty('--y', `${smoothY + 12}px`);
+
+    const pathData = `M ${anchorX} ${anchorY} C ${anchorX + 120} ${anchorY - 120}, ${anchorX + dx * 0.72 + 40} ${anchorY + dy * 0.32 - 30}, ${smoothX} ${smoothY}`;
+    cursorCablePath.setAttribute('d', pathData);
+    cursorCableGlow.setAttribute('d', pathData);
+  };
+
+  document.addEventListener('pointermove', updateCable);
+  document.addEventListener('pointerleave', deactivate);
+  document.addEventListener('pointerenter', () => siteCursorLayer.classList.add('is-active'));
+  document.addEventListener('pointerdown', updateCable);
+  window.addEventListener('resize', resetPath);
+  resetPath();
+}
 
 menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
