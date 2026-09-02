@@ -1,66 +1,15 @@
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.desktop-nav');
-const siteCursorLayer = document.querySelector('.site-cursor-layer');
-const cursorCable = document.querySelector('.cursor-cable');
-const cursorFiber = document.querySelector('.cursor-fiber');
-const cursorRJ45 = document.querySelector('.cursor-rj45');
-const cursorCablePath = document.querySelector('.cursor-cable-path');
-const cursorCableGlow = document.querySelector('.cursor-cable-glow');
-
-if (siteCursorLayer && cursorCable && cursorFiber && cursorRJ45 && cursorCablePath && cursorCableGlow) {
-  const syncCableViewport = () => {
-    cursorCable.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
-  };
-
-  let lastX = window.innerWidth * 0.5;
-  let lastY = window.innerHeight * 0.82;
-
-  const deactivate = () => {
-    siteCursorLayer.classList.remove('is-active');
-  };
-
-  const resetPath = () => {
-    syncCableViewport();
-    const x = window.innerWidth * 0.5;
-    const y = window.innerHeight * 0.82;
-    const pathData = `M ${x} ${y} C ${x + 80} ${y - 118}, ${x + 140} ${y - 70}, ${x + 42} ${y - 18}`;
-    cursorCablePath.setAttribute('d', pathData);
-    cursorCableGlow.setAttribute('d', pathData);
-  };
-
-  const updateCable = (event) => {
-    siteCursorLayer.classList.add('is-active');
-    syncCableViewport();
-
-    const targetX = Math.min(Math.max(event.clientX, 0), window.innerWidth);
-    const targetY = Math.min(Math.max(event.clientY, 0), window.innerHeight);
-
-    const smoothX = lastX + (targetX - lastX) * 0.17;
-    const smoothY = lastY + (targetY - lastY) * 0.17;
-    lastX = smoothX;
-    lastY = smoothY;
-
-    const anchorX = window.innerWidth * 0.28;
-    const anchorY = window.innerHeight * 0.82;
-    const dx = smoothX - anchorX;
-    const dy = smoothY - anchorY;
-
-    cursorFiber.style.setProperty('--x', `${smoothX}px`);
-    cursorFiber.style.setProperty('--y', `${smoothY}px`);
-    cursorRJ45.style.setProperty('--x', `${smoothX - 10}px`);
-    cursorRJ45.style.setProperty('--y', `${smoothY + 12}px`);
-
-    const pathData = `M ${anchorX} ${anchorY} C ${anchorX + 120} ${anchorY - 120}, ${anchorX + dx * 0.72 + 40} ${anchorY + dy * 0.32 - 30}, ${smoothX} ${smoothY}`;
-    cursorCablePath.setAttribute('d', pathData);
-    cursorCableGlow.setAttribute('d', pathData);
-  };
-
-  document.addEventListener('pointermove', updateCable);
-  document.addEventListener('pointerleave', deactivate);
-  document.addEventListener('pointerenter', () => siteCursorLayer.classList.add('is-active'));
-  document.addEventListener('pointerdown', updateCable);
-  window.addEventListener('resize', resetPath);
-  resetPath();
+const networkCursor = document.querySelector('.network-cursor');
+if (networkCursor && window.matchMedia('(pointer: fine)').matches) {
+  document.addEventListener('pointermove', (event) => {
+    networkCursor.style.setProperty('--cursor-x', `${event.clientX}px`);
+    networkCursor.style.setProperty('--cursor-y', `${event.clientY}px`);
+  });
+  document.addEventListener('pointerdown', () => {
+    networkCursor.classList.remove('is-pulsing');
+    requestAnimationFrame(() => networkCursor.classList.add('is-pulsing'));
+  });
 }
 
 menuButton?.addEventListener('click', () => {
@@ -193,3 +142,63 @@ const finishQuiz = () => {
 const newQuiz = () => { quiz.index = 0; quiz.score = 0; quiz.streak = 0; quiz.order = shuffle([...Array(quizQuestions.length).keys()]); scoreEl.textContent = '0'; streakEl.textContent = '0'; renderQuestion(); };
 document.querySelector('#game-reset')?.addEventListener('click', newQuiz);
 if (questionEl && optionsEl) newQuiz();
+
+const failureState = new Set();
+const failureLinks = { edge: 'link-core-edge', firewall: 'link-core-fw', wireless: 'link-core-ap', server: 'link-core-server' };
+const failureMessages = {
+  edge: 'Edge router unreachable — OSPF adjacency lost. Traffic is rerouting through the backup path.',
+  firewall: 'Firewall isolated — Sophos HA failover required. Secure zones are currently degraded.',
+  wireless: 'Wireless controller unavailable — Ruckus AP clients are offline. Wired services remain nominal.',
+  server: 'Server farm stopped — AD and FIDS dependencies are unavailable. Network fabric remains healthy.'
+};
+const renderFailureState = () => {
+  document.querySelectorAll('.failure-node').forEach((node) => node.classList.toggle('is-failed', failureState.has(node.dataset.node)));
+  document.querySelectorAll('.failure-link').forEach((link) => {
+    const failed = [...failureState].some((fault) => link.classList.contains(failureLinks[fault]));
+    link.style.opacity = failed ? '0.18' : '1';
+    link.style.background = failed ? '#ff806d' : '';
+  });
+  const health = document.querySelector('#failure-health');
+  if (health) {
+    health.textContent = failureState.size ? `● ${failureState.size} ACTIVE FAULT${failureState.size > 1 ? 'S' : ''}` : '● NOMINAL';
+    health.style.color = failureState.size ? '#ff806d' : '';
+  }
+};
+document.querySelectorAll('.sim-control[data-fault]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const fault = button.dataset.fault;
+    failureState.add(fault);
+    const log = document.querySelector('#failure-log');
+    if (log) log.textContent = `[alert] ${failureMessages[fault]}\n[action] Investigate telemetry, isolate scope, restore safely.`;
+    renderFailureState();
+  });
+});
+document.querySelector('#reset-failures')?.addEventListener('click', () => {
+  failureState.clear();
+  const log = document.querySelector('#failure-log');
+  if (log) log.textContent = '[recovery] All devices restored. Links healthy and services nominal.';
+  renderFailureState();
+});
+document.querySelectorAll('.failure-node').forEach((node) => {
+  node.addEventListener('click', () => {
+    const fault = node.dataset.node;
+    if (fault === 'core') return;
+    failureState.has(fault) ? failureState.delete(fault) : failureState.add(fault);
+    const log = document.querySelector('#failure-log');
+    if (log) log.textContent = failureState.has(fault) ? `[alert] ${failureMessages[fault]}` : `[recovery] ${node.textContent.split('\n')[0]} restored.`;
+    renderFailureState();
+  });
+});
+
+document.querySelector('#contact-form')?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const name = form.querySelector('[name="name"]').value.trim();
+  const email = form.querySelector('[name="email"]').value.trim();
+  const message = form.querySelector('[name="message"]').value.trim();
+  const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
+  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+  window.location.href = `mailto:isohitv@gmail.com?subject=${subject}&body=${body}`;
+  const status = document.querySelector('#form-status');
+  if (status) status.textContent = 'Opening your email client…';
+});
