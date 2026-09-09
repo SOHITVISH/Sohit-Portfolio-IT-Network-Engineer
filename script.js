@@ -338,6 +338,251 @@ setInterval(() => {
   if (labLoss && !failureState.has('traffic')) labLoss.textContent = `${(activePenalty * .4 + Math.random() * .3).toFixed(1)}%`;
 }, 1400);
 
+const copilotPlans = {
+  ospf: { severity: 'P1 · HIGH', confidence: '92%', lines: ['[signal] OSPF neighbors dropped', '[likely cause] WAN/interface, MTU or authentication mismatch', '[triage] show ip ospf neighbor → show interfaces → ping next hop', '[action] Restore the smallest failed link, then verify adjacency and routes.'], evidence: ['Neighbor state and last reset reason', 'Interface errors, MTU and authentication', 'Next-hop reachability and route table'] },
+  dhcp: { severity: 'P1 · HIGH', confidence: '89%', lines: ['[signal] Clients have 169.254.x.x addresses', '[likely cause] DHCP scope, relay or server reachability', '[triage] show ip interface → verify helper-address → test DHCP server', '[action] Restore DHCP/NTP service, renew one client, then monitor the scope.'], evidence: ['Client lease and DHCP scope health', 'Relay/helper-address on the SVI', 'Server reachability and service logs'] },
+  wifi: { severity: 'P2 · MEDIUM', confidence: '86%', lines: ['[signal] Ruckus clients fail authentication', '[likely cause] WLC/RADIUS path or VLAN assignment', '[triage] check AP join state → test RADIUS → validate WLAN VLAN', '[action] Recover control-plane access before changing wireless policy.'], evidence: ['AP join and controller reachability', 'RADIUS response and shared-secret status', 'WLAN-to-VLAN assignment and DHCP'] },
+  cctv: { severity: 'P1 · HIGH', confidence: '88%', lines: ['[signal] Multiple cameras unreachable', '[likely cause] CCTV VLAN, PoE/access switch or NVR path', '[triage] test gateway → inspect switch port/PoE → verify NVR service', '[action] Isolate one zone and restore service without disturbing FIDS.'], evidence: ['Affected camera zone and switch ports', 'PoE budget and access VLAN state', 'NVR reachability and recording status'] },
+  fids: { severity: 'P1 · HIGH', confidence: '84%', lines: ['[signal] Passenger displays are stale', '[likely cause] FIDS app, DNS or upstream service path', '[triage] ping app → resolve DNS → inspect service health and logs', '[action] Recover the application dependency, then confirm display updates.'], evidence: ['Display heartbeat and application queue', 'DNS resolution from the FIDS VLAN', 'Upstream service logs and timestamps'] }
+};
+const renderCopilotPlan = () => {
+  const signal = document.querySelector('#copilot-symptom')?.value;
+  const plan = copilotPlans[signal];
+  const output = document.querySelector('#copilot-output');
+  const severity = document.querySelector('#copilot-severity');
+  const confidence = document.querySelector('#copilot-confidence');
+  const evidence = document.querySelector('#copilot-evidence');
+  if (!plan) return;
+  if (output) output.textContent = plan.lines.join('\n');
+  if (severity) severity.textContent = `SEVERITY ${plan.severity}`;
+  if (confidence) confidence.textContent = `CONFIDENCE ${plan.confidence}`;
+  if (evidence) evidence.innerHTML = plan.evidence.map((item) => `<span>□ ${item}</span>`).join('');
+};
+document.querySelector('#copilot-run')?.addEventListener('click', renderCopilotPlan);
+document.querySelector('#copilot-symptom')?.addEventListener('change', renderCopilotPlan);
+
+const commandMode = document.querySelector('#command-mode');
+commandMode?.addEventListener('click', () => {
+  document.body.classList.toggle('command-mode-active');
+  commandMode.textContent = document.body.classList.contains('command-mode-active') ? 'Exit command center Esc' : 'Enter full-screen mode ⛶';
+  if (document.body.classList.contains('command-mode-active')) document.querySelector('#command-center')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && document.body.classList.contains('command-mode-active')) {
+    document.body.classList.remove('command-mode-active');
+    if (commandMode) commandMode.textContent = 'Enter full-screen mode ⛶';
+  }
+});
+document.querySelectorAll('.alert-row').forEach((row) => row.addEventListener('click', () => {
+  document.querySelectorAll('.alert-row').forEach((item) => item.classList.remove('active'));
+  row.classList.add('active');
+  const status = document.querySelector('#command-status');
+  if (status) status.textContent = `[selected] ${row.querySelector('b')?.textContent || 'Incident'} · choose an action below.`;
+}));
+document.querySelectorAll('[data-incident-action]').forEach((button) => button.addEventListener('click', () => {
+  const active = document.querySelector('.alert-row.active');
+  const name = active?.querySelector('b')?.textContent || 'Selected incident';
+  const action = button.dataset.incidentAction;
+  const status = document.querySelector('#command-status');
+  if (status) status.textContent = `[${action}] ${name} · workflow state updated locally.`;
+  if (action === 'resolve' && active) active.classList.add('resolved');
+}));
+document.querySelectorAll('.map-zone').forEach((zone) => zone.addEventListener('click', () => {
+  const signal = zone.dataset.zone;
+  const select = document.querySelector('#copilot-symptom');
+  if (select && copilotPlans[signal]) { select.value = signal; renderCopilotPlan(); }
+  const readout = document.querySelector('#zone-readout');
+  if (readout) readout.textContent = `ZONE ${zone.textContent.split('\n')[0].trim()} · INCIDENT LOADED INTO COPILOT`;
+  document.querySelector('#ops-studio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+
+const tracePacket = document.querySelector('#trace-packet');
+tracePacket?.addEventListener('click', () => {
+  const source = document.querySelector('#packet-source')?.value.split(' · ')[0] || 'Client';
+  const destination = document.querySelector('#packet-destination')?.value.split(' · ')[0] || 'Server';
+  const log = document.querySelector('#journey-log');
+  const track = document.querySelector('#journey-track');
+  if (track) { track.classList.remove('is-tracing'); requestAnimationFrame(() => track.classList.add('is-tracing')); }
+  if (log) log.textContent = `[trace] ${source} → ACCESS → DISTRIBUTION → CORE → FIREWALL → ${destination}\n[result] 6 hops · policy permitted · 3.1ms simulated RTT`;
+});
+document.querySelector('#scan-diff')?.addEventListener('click', () => {
+  const status = document.querySelector('#diff-status');
+  if (status) status.textContent = '[risk] Review trunk conversion and DHCP snooping trust before approval.';
+});
+
+const passportCopy = {
+  airport: 'AIRPORT · Cisco, Sophos, Ruckus, NOC operations and zero-downtime support.',
+  wipro: 'WIPRO · SLA-driven application support, incident management and production troubleshooting.',
+  arivani: 'ARIVANI · Python, JavaScript, REST APIs and production web application delivery.'
+};
+document.querySelectorAll('.passport-node').forEach((node) => node.addEventListener('click', () => {
+  document.querySelectorAll('.passport-node').forEach((item) => item.classList.remove('active'));
+  node.classList.add('active');
+  const readout = document.querySelector('#passport-readout');
+  if (readout) readout.textContent = passportCopy[node.dataset.passport];
+}));
+
+const terminalResponses = {
+  'whoami': 'SOHIT VISHWAKARMA\\nNetwork & IT Infrastructure Engineer · L1/L2 · NOC Operations',
+  'about sohit': 'Airport infrastructure engineer focused on reliable networks, safe automation and clear incident response.',
+  'show achievements': '99%+ uptime · 20+ Cisco switches · 55+ Ruckus APs · 300+ CCTV cameras · 4h+ weekly automation impact',
+  'show certifications': 'Sophos Network Engineering · FortiGate Administration · Cisco Networking · Cybersecurity simulations',
+  'sudo hire sohit': 'ACCESS GRANTED ✓\\nRecommendation: schedule a technical conversation at isohitv@gmail.com'
+};
+document.querySelector('#portfolio-terminal-form')?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const input = document.querySelector('#portfolio-terminal-input');
+  const output = document.querySelector('#portfolio-terminal-output');
+  const command = input?.value.trim().toLowerCase();
+  if (output) output.textContent = terminalResponses[command] || 'Command not found. Try: whoami, about sohit, show achievements, show certifications, sudo hire sohit';
+  if (input) input.value = '';
+});
+
+const replaySteps = [
+  '[01] Alert received · NMS raised a trunk degradation signal.',
+  '[02] Engineer action · isolated the affected VLAN and checked trunk state.',
+  '[03] Root cause · native VLAN mismatch introduced packet loss.',
+  '[04] Recovery · restored the approved trunk configuration and verified paths.',
+  '[05] Prevention · added config-diff review to the automation runbook.'
+];
+let replayTimer = null;
+document.querySelector('#replay-theatre-run')?.addEventListener('click', () => {
+  const steps = document.querySelectorAll('.replay-step');
+  const readout = document.querySelector('#replay-readout');
+  let index = 0;
+  if (replayTimer) clearInterval(replayTimer);
+  steps.forEach((step) => step.classList.remove('active', 'complete'));
+  replayTimer = setInterval(() => {
+    steps.forEach((step, stepIndex) => step.classList.toggle('complete', stepIndex < index));
+    if (steps[index]) steps[index].classList.add('active');
+    if (readout) readout.textContent = replaySteps[index] || replaySteps[replaySteps.length - 1];
+    index += 1;
+    if (index >= replaySteps.length) { clearInterval(replayTimer); replayTimer = null; }
+  }, 700);
+});
+
+const radarData = {
+  routing: ['ROUTING & SWITCHING', 'Project: MVI Airport Network Deployment', 'Cisco Catalyst · OSPF · VLAN · STP/RSTP'],
+  security: ['SECURITY & VPN', 'Case study: Sophos Firewall HA and secure airport zones', 'Sophos · FortiGate · IPsec · NAT · IPS'],
+  automation: ['AUTOMATION', 'Project: Repeatable network backup and compliance workflow', 'Python · Netmiko · NAPALM · Ansible · Git'],
+  noc: ['NOC OPERATIONS', 'Case study: 24/7 airport monitoring and incident response', 'Infron NMS · Zabbix · Wireshark · RCA']
+};
+document.querySelectorAll('.radar-option').forEach((option) => option.addEventListener('click', () => {
+  document.querySelectorAll('.radar-option').forEach((item) => item.classList.remove('active'));
+  option.classList.add('active');
+  const data = radarData[option.dataset.skill];
+  const readout = document.querySelector('#radar-readout');
+  if (readout && data) readout.innerHTML = `<b>${data[0]}</b><span>${data[1]}</span><small>${data[2]}</small>`;
+}));
+
+const builderCanvas = document.querySelector('#builder-canvas');
+const builderStatus = document.querySelector('#builder-status');
+let builderCount = 0;
+let builderSelected = null;
+const builderConnections = [];
+const builderLinkSvg = builderCanvas?.querySelector('.builder-links');
+const renderBuilderLinks = () => {
+  if (!builderLinkSvg || !builderCanvas) return;
+  const bounds = builderCanvas.getBoundingClientRect();
+  builderLinkSvg.setAttribute('viewBox', `0 0 ${builderCanvas.clientWidth} ${builderCanvas.clientHeight}`);
+  builderLinkSvg.innerHTML = builderConnections.map(([from, to]) => {
+    const a = from.getBoundingClientRect();
+    const b = to.getBoundingClientRect();
+    const x1 = a.left - bounds.left + a.width / 2;
+    const y1 = a.top - bounds.top + a.height / 2;
+    const x2 = b.left - bounds.left + b.width / 2;
+    const y2 = b.top - bounds.top + b.height / 2;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
+  }).join('');
+};
+const updateBuilderStatus = () => {
+  if (builderStatus) builderStatus.textContent = `${builderCount} devices · ${builderConnections.length} links`;
+  const hint = builderCanvas?.querySelector('.canvas-hint');
+  if (hint) hint.hidden = builderCount > 0;
+  renderBuilderLinks();
+};
+const addBuilderDevice = (type, x = 20 + (builderCount % 4) * 82, y = 24 + Math.floor(builderCount / 4) * 58) => {
+  if (!builderCanvas || builderCount >= 10) return;
+  const device = document.createElement('button');
+  device.type = 'button';
+  device.className = 'canvas-device';
+  device.dataset.device = type;
+  device.style.left = `${Math.min(x, builderCanvas.clientWidth - 84)}px`;
+  device.style.top = `${Math.min(y, builderCanvas.clientHeight - 48)}px`;
+  device.innerHTML = `${type.toUpperCase()}<small>SIMULATED</small>`;
+  device.addEventListener('click', () => {
+    if (!builderSelected) { builderSelected = device; device.classList.add('selected'); return; }
+    if (builderSelected === device) { device.classList.remove('selected'); builderSelected = null; return; }
+    const duplicate = builderConnections.some(([from, to]) => (from === builderSelected && to === device) || (from === device && to === builderSelected));
+    if (duplicate) { builderSelected.classList.remove('selected'); builderSelected = null; return; }
+    builderConnections.push([builderSelected, device]);
+    builderSelected.classList.remove('selected');
+    builderSelected = null;
+    updateBuilderStatus();
+  });
+  builderCanvas.appendChild(device);
+  builderCount += 1;
+  updateBuilderStatus();
+};
+document.querySelectorAll('#builder-tools button').forEach((tool) => {
+  tool.addEventListener('dragstart', (event) => event.dataTransfer?.setData('text/plain', tool.dataset.device));
+  tool.addEventListener('click', () => addBuilderDevice(tool.dataset.device));
+});
+builderCanvas?.addEventListener('dragover', (event) => { event.preventDefault(); builderCanvas.classList.add('is-over'); });
+builderCanvas?.addEventListener('dragleave', () => builderCanvas.classList.remove('is-over'));
+builderCanvas?.addEventListener('drop', (event) => {
+  event.preventDefault();
+  builderCanvas.classList.remove('is-over');
+  const rect = builderCanvas.getBoundingClientRect();
+  addBuilderDevice(event.dataTransfer?.getData('text/plain') || 'switch', event.clientX - rect.left - 40, event.clientY - rect.top - 20);
+});
+document.querySelector('#builder-reset')?.addEventListener('click', () => {
+  builderCanvas?.querySelectorAll('.canvas-device').forEach((device) => device.remove());
+  builderCount = 0; builderConnections.length = 0; builderSelected = null; updateBuilderStatus();
+});
+window.addEventListener('resize', renderBuilderLinks);
+
+const runbookLogs = {
+  backup: ['[precheck] 20 devices reachable via SSH', '[execute] collecting running-config from Catalyst estate', '[verify] checksums match and archive committed to Git', '[result] 20/20 backups complete · ROLLBACK READY'],
+  ospf: ['[precheck] 12 OSPF neighbors discovered', '[execute] collecting adjacency, route and interface state', '[verify] all expected routes present · no flaps detected', '[result] topology health PASS · evidence exported'],
+  vlan: ['[precheck] loading intended VLAN state from YAML', '[execute] comparing access and trunk ports', '[verify] 2 drift items detected and safely flagged', '[result] audit complete · change approval required']
+};
+const runbookTimeSaved = { backup: 'EST. TIME SAVED 4h+', ospf: 'EST. TIME SAVED 90m', vlan: 'EST. TIME SAVED 2h' };
+let selectedRunbook = 'backup';
+let runbookTimer = null;
+const runbookProgress = (step, total, running = true) => {
+  const bar = document.querySelector('#runbook-progress-bar');
+  const label = document.querySelector('#runbook-progress-label');
+  const button = document.querySelector('#run-runbook');
+  if (bar) bar.style.width = `${Math.round((step / total) * 100)}%`;
+  if (label) label.textContent = running ? `RUNNING · ${step}/${total}` : `COMPLETE · ${step}/${total}`;
+  if (button) button.disabled = running;
+};
+document.querySelectorAll('.runbook-choice').forEach((choice) => choice.addEventListener('click', () => {
+  if (runbookTimer) clearInterval(runbookTimer);
+  document.querySelectorAll('.runbook-choice').forEach((item) => item.classList.remove('active'));
+  choice.classList.add('active');
+  selectedRunbook = choice.dataset.runbook;
+  const saved = document.querySelector('#runbook-time-saved');
+  if (saved) saved.textContent = runbookTimeSaved[selectedRunbook];
+  runbookProgress(0, 4, false);
+}));
+document.querySelector('#run-runbook')?.addEventListener('click', () => {
+  const log = document.querySelector('#runbook-log');
+  const steps = runbookLogs[selectedRunbook];
+  let index = 0;
+  if (!log) return;
+  if (runbookTimer) clearInterval(runbookTimer);
+  log.textContent = '[start] dry run initialized...\n';
+  runbookProgress(0, steps.length, true);
+  runbookTimer = setInterval(() => {
+    log.textContent += `${steps[index++]}\n`;
+    runbookProgress(index, steps.length, index < steps.length);
+    if (index >= steps.length) { clearInterval(runbookTimer); runbookTimer = null; }
+  }, 550);
+});
+document.querySelector('#runbook-time-saved').textContent = runbookTimeSaved.backup;
+
 const WEB3FORMS_ACCESS_KEY = '0cf72841-5646-4255-8636-320e160e44b8';
 
 document.querySelector('#contact-form')?.addEventListener('submit', async (event) => {
