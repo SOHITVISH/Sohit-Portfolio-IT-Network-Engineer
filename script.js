@@ -47,10 +47,16 @@ nav?.querySelectorAll('a').forEach((link) => {
 });
 
 const progress = document.querySelector('.scroll-progress');
-window.addEventListener('scroll', () => {
+let progressFrame = 0;
+const updateScrollProgress = () => {
+  progressFrame = 0;
   const max = document.documentElement.scrollHeight - window.innerHeight;
-  if (progress) progress.style.width = `${max > 0 ? (window.scrollY / max) * 100 : 0}%`;
+  if (progress) progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+};
+window.addEventListener('scroll', () => {
+  if (!progressFrame) progressFrame = requestAnimationFrame(updateScrollProgress);
 }, { passive: true });
+updateScrollProgress();
 
 document.querySelectorAll('.filter').forEach((button) => {
   button.addEventListener('click', () => {
