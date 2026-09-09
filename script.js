@@ -1,5 +1,26 @@
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.desktop-nav');
+const networkClock = document.querySelector('#network-clock');
+const packetCount = document.querySelector('#packet-count');
+const throughput = document.querySelector('#throughput');
+const networkLatency = document.querySelector('#network-latency');
+const networkStatus = document.querySelector('#network-status');
+const mapSimulate = document.querySelector('#map-simulate');
+let networkSeconds = 24;
+setInterval(() => {
+  networkSeconds = (networkSeconds + 1) % 3600;
+  if (networkClock) networkClock.firstChild.textContent = `${String(Math.floor(networkSeconds / 60)).padStart(2, '0')}:${String(networkSeconds % 60).padStart(2, '0')} `;
+  if (packetCount) packetCount.textContent = `${(18426 + Math.floor(Math.random() * 180)).toLocaleString()}`;
+  if (throughput) throughput.textContent = `${780 + Math.floor(Math.random() * 140)} Mbps`;
+}, 1200);
+mapSimulate?.addEventListener('click', () => {
+  if (!networkStatus || !networkLatency || !mapSimulate) return;
+  networkStatus.textContent = 'Health check complete · all systems nominal';
+  networkLatency.textContent = `${(2 + Math.random() * 1.2).toFixed(1)}ms`;
+  mapSimulate.textContent = 'CHECK COMPLETE ✓';
+  mapSimulate.classList.add('is-complete');
+  setTimeout(() => { mapSimulate.textContent = 'RUN HEALTH CHECK ↻'; mapSimulate.classList.remove('is-complete'); }, 2200);
+});
 const networkCursor = document.querySelector('.network-cursor');
 if (networkCursor && window.matchMedia('(pointer: fine)').matches) {
   document.addEventListener('pointermove', (event) => {

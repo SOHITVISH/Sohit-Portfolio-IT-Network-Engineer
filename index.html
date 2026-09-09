@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Portfolio of Sohit Vishwakarma — Network & IT Infrastructure Engineer." />
+  <meta name="theme-color" content="#010b08" />
   <title>Sohit Vishwakarma | Network Infrastructure Engineer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,6 +15,7 @@
   <div class="network-cursor" aria-hidden="true"></div>
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
+  <a class="skip-link" href="#top">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="#top" aria-label="Sohit Vishwakarma home">
       <span class="brand-mark">SV<span class="pulse-dot"></span></span>
@@ -49,7 +51,8 @@
         </div>
       </div>
       <div class="network-visual" aria-label="Live airport network operations map">
-        <div class="visual-head"><div class="visual-label mono"><span class="live-bars"><i></i><i></i><i></i></span> LIVE / NETWORK MAP</div><span class="visual-clock mono">00:00:24 <b>UTC</b></span></div>
+        <div class="visual-head"><div class="visual-label mono"><span class="live-bars"><i></i><i></i><i></i></span> LIVE / NETWORK MAP</div><span class="visual-clock mono" id="network-clock">00:00:24 <b>UTC</b></span></div>
+        <div class="network-telemetry mono"><span>PACKETS <b id="packet-count">18,426</b></span><span>THROUGHPUT <b id="throughput">842 Mbps</b></span><span>LINKS <b>06 / 06</b></span></div>
         <div class="topology">
           <div class="node node-core"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/><circle cx="16" cy="16" r="1"/></svg></span><b>CORE SWITCH</b><small>10.0.0.1 · L3</small><i class="node-state"></i></div>
           <div class="node node-edge"><span class="node-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17h16M7 17V9l5-4 5 4v8M9 13h6M12 5v3"/></svg></span><b>EDGE ROUTER</b><small>OSPF / BGP</small><i class="node-state"></i></div>
@@ -77,22 +80,19 @@
           <span class="skill-node skill-four">LINUX / SSH</span>
           <span class="skill-node skill-five">AD / GPO</span>
           <span class="skill-node skill-six">WIRESHARK</span>
-          <span class="skill-node skill-seven">PYTHON / NETMIKO</span>
+          <span class="skill-node skill-seven">PYTHON / NETMIKO</span><span class="skill-node skill-eight">ANSIBLE</span><span class="skill-node skill-nine">AWS VPC</span><span class="skill-node skill-ten">ZABBIX</span><span class="skill-node skill-eleven">DOCKER</span>
           <i class="web-link web-link-a"></i><i class="web-link web-link-b"></i><i class="web-link web-link-c"></i><i class="web-link web-link-d"></i>
         </div>
-        <div class="visual-footer mono"><span><i></i> All systems nominal</span><span>AYD / INDIA</span><span>LATENCY <b>2.4ms</b></span></div>
+        <div class="visual-footer mono"><span><i></i> <b id="network-status">All systems nominal</b></span><span>AYD / INDIA</span><span>LATENCY <b id="network-latency">2.4ms</b></span><button class="map-sim-button mono" id="map-simulate" type="button">RUN HEALTH CHECK ↻</button></div>
       </div>
     </section>
 
     <section class="logo-strip section-shell">
-      <span class="mono">FIELD NOTES FROM THE STACK</span>
+      <div class="stack-heading"><span class="mono">FIELD NOTES FROM THE STACK</span><small class="mono">DAILY NETWORK TOOLKIT / 16 SYSTEMS</small></div>
       <div class="stack-list" aria-label="Technology stack">
-        <span><i class="stack-icon stack-cisco" aria-hidden="true">C</i>CISCO</span>
-        <span><i class="stack-icon stack-ruckus" aria-hidden="true">◉</i>RUCKUS</span>
-        <span><i class="stack-icon stack-sophos" aria-hidden="true">S</i>SOPHOS</span>
-        <span><i class="stack-icon stack-forti" aria-hidden="true">F</i>FORTINET</span>
-        <span><i class="stack-icon stack-zabbix" aria-hidden="true">Z</i>ZABBIX</span>
-        <span><i class="stack-icon stack-aws" aria-hidden="true">λ</i>AWS</span>
+        <span title="Cisco IOS"><i class="stack-icon stack-cisco" aria-hidden="true">C</i>CISCO</span><span title="Ruckus Wireless"><i class="stack-icon stack-ruckus" aria-hidden="true">◉</i>RUCKUS</span><span title="Sophos Firewall"><i class="stack-icon stack-sophos" aria-hidden="true">S</i>SOPHOS</span><span title="Fortinet Security"><i class="stack-icon stack-forti" aria-hidden="true">F</i>FORTINET</span><span title="Zabbix Monitoring"><i class="stack-icon stack-zabbix" aria-hidden="true">Z</i>ZABBIX</span><span title="Amazon Web Services"><i class="stack-icon stack-aws" aria-hidden="true">λ</i>AWS</span>
+        <span title="Wireshark Packet Analysis"><i class="stack-icon stack-wireshark" aria-hidden="true">◈</i>WIRESHARK</span><span title="Python Automation"><i class="stack-icon stack-python" aria-hidden="true">Py</i>PYTHON</span><span title="Ansible Automation"><i class="stack-icon stack-ansible" aria-hidden="true">A</i>ANSIBLE</span><span title="Linux Administration"><i class="stack-icon stack-linux" aria-hidden="true">⌁</i>LINUX</span><span title="Microsoft Azure"><i class="stack-icon stack-azure" aria-hidden="true">▰</i>AZURE</span>
+        <span title="VMware Virtualization"><i class="stack-icon stack-vmware" aria-hidden="true">V</i>VMWARE</span><span title="Nmap Security Scanning"><i class="stack-icon stack-nmap" aria-hidden="true">N</i>NMAP</span><span title="Git Version Control"><i class="stack-icon stack-git" aria-hidden="true">◆</i>GIT</span><span title="Docker Containers"><i class="stack-icon stack-docker" aria-hidden="true">◇</i>DOCKER</span>
       </div>
     </section>
 
