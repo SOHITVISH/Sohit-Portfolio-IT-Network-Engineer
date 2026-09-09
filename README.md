@@ -70,23 +70,33 @@ Zabbix deployment for SNMP-based device monitoring with dashboards and alerts fo
 
 ## Run Locally
 
-This is a dependency-free static website.
+The portfolio is powered by React and Vite, with the existing custom cyber-operations CSS system preserved during the staged component migration.
 
 ```bash
 git clone https://github.com/SOHITVISH/Sohit-Portfolio-IT-Network-Engineer.git
 cd Sohit-Portfolio-IT-Network-Engineer
-python -m http.server 8000
+npm install
+npm run dev
 ```
 
-Open [http://localhost:8000](http://localhost:8000) in a browser.
+Open the Vite URL shown in the terminal. To create a production bundle:
+
+```bash
+npm run build
+```
 
 ## Project Structure
 
 ```text
 .
-├── index.html   # Portfolio content and structure
+├── index.html   # Vite entry point
+├── src/         # React application shell and migration components
+├── legacy.html  # Preserved source document during staged migration
+├── public/        # Runtime content, profile assets and legacy interactions
 ├── style.css    # Dark visual system and responsive layout
 ├── script.js    # Interactions, filters, console and mini game
+├── vite.config.js
+├── package.json
 └── README.md    # Project documentation
 ```
 
