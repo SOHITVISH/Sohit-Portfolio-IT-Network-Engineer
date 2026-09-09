@@ -63,16 +63,24 @@ document.querySelectorAll('.filter').forEach((button) => {
   });
 });
 
-const consoleMessages = {
-  uptime: '> uptime: 99%+ | environment: mission-critical | status: nominal',
-  stack: '> stack: Cisco · Sophos · Ruckus · Python · Zabbix · AWS',
-  approach: '> approach: detect → isolate → analyze → resolve → prevent'
+const cliResponses = {
+  'show version': 'Cisco IOS XE Software, Version 17.09.04\nSW-CORE uptime is 1 year, 184 days\nModel: Catalyst 9300 · image: CAT9K_IOSXE',
+  'show vlan brief': 'VLAN  Name                 Status    Ports\n10    MGMT                 active    Gi1/0/1-4\n20    FIDS                 active    Gi1/0/5-12\n30    CCTV                 active    Gi1/0/13-24\n40    GUEST-WIFI           active    Gi1/0/25-36',
+  'show ip route': 'O    10.0.10.0/24 [110/2] via 10.0.0.2, Vlan10\nO    10.0.20.0/24 [110/2] via 10.0.0.2, Vlan20\nC    10.0.0.0/30 is directly connected, Gi1/1/1\nGateway of last resort is 10.0.0.2',
+  'show interfaces status': 'Port      Name       Status       Vlan  Duplex  Speed\nGi1/0/1   AD-DNS     connected    10    a-full  a-1000\nGi1/0/5   FIDS-APP   connected    20    a-full  a-1000\nGi1/0/13  CCTV-NVR   connected    30    a-full  a-1000\nGi1/1/1   DIST-A     connected    trunk a-full  a-10000',
+  'show spanning-tree': 'VLAN0020\nRoot ID    Priority 24596  Address 00:aa:bb:cc:20:01\nThis bridge is the root\nGi1/1/1  Desg FWD 10  P2p',
+  'ping 10.0.20.15': 'Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 10.0.20.15...\n!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 2/3/5 ms'
 };
-document.querySelectorAll('.console-actions button').forEach((button) => {
-  button.addEventListener('click', () => {
-    const output = document.querySelector('.console-output');
-    if (output) output.textContent = consoleMessages[button.dataset.command];
-  });
+const runCliCommand = (command) => {
+  const output = document.querySelector('#cli-output');
+  const normalized = command.trim().toLowerCase();
+  if (output) output.textContent = cliResponses[normalized] || `% Invalid input detected at '^' marker.\nTry: show version, show vlan brief, show ip route, ping 10.0.20.15`;
+};
+document.querySelectorAll('.console-actions button').forEach((button) => button.addEventListener('click', () => runCliCommand(button.dataset.command)));
+document.querySelector('#cli-form')?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const input = document.querySelector('#cli-input');
+  if (input) { runCliCommand(input.value); input.value = ''; }
 });
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -165,17 +173,82 @@ document.querySelector('#game-reset')?.addEventListener('click', newQuiz);
 if (questionEl && optionsEl) newQuiz();
 
 const failureState = new Set();
-const failureLinks = { edge: 'link-core-edge', firewall: 'link-core-fw', wireless: 'link-core-ap', server: 'link-core-server' };
+const failureLinks = { edge: ['link-core-edge'], firewall: ['link-core-fw'], wireless: ['link-core-ap'], server: ['link-core-server', 'link-dist-a-servers', 'link-dist-b-servers'], link: ['link-core-dist-a', 'link-core-dist-b'], stp: ['link-dist-a-access-a', 'link-dist-a-access-b', 'link-dist-b-access-c', 'link-dist-b-access-d'], dhcp: ['link-dist-a-servers'], traffic: [] };
 const failureMessages = {
   edge: 'Edge router unreachable — OSPF adjacency lost. Traffic is rerouting through the backup path.',
   firewall: 'Firewall isolated — Sophos HA failover required. Secure zones are currently degraded.',
   wireless: 'Wireless controller unavailable — Ruckus AP clients are offline. Wired services remain nominal.',
-  server: 'Server farm stopped — AD and FIDS dependencies are unavailable. Network fabric remains healthy.'
+  server: 'Server farm stopped — AD and FIDS dependencies are unavailable. Network fabric remains healthy.',
+  link: 'Distribution trunk degraded — traffic is taking the alternate path with increased latency.',
+  stp: 'STP loop detected — broadcast protection is converging and access ports are rate-limited.',
+  dhcp: 'DHCP/NTP service unavailable — new clients are receiving APIPA addresses until recovery.',
+  traffic: 'Traffic spike injected — simulated throughput is above threshold and packet loss is rising.',
+  'dist-a': 'DIST-A unavailable — VLAN gateways are reconverging through DIST-B.',
+  'dist-b': 'DIST-B unavailable — redundant gateway path is carrying the simulated load.',
+  wlc: 'Wireless controller unavailable — Ruckus APs are isolated from the management plane.',
+  lb: 'Load balancer unhealthy — FIDS web sessions are draining to the backup pool.',
+  'access-a': 'SW-01 access switch offline — VLAN 20 endpoints are unreachable.',
+  'access-b': 'SW-02 access switch offline — VLAN 30 endpoints are unreachable.',
+  'access-c': 'SW-03 access switch offline — VLAN 40 endpoints are unreachable.',
+  'access-d': 'SW-04 access switch offline — VLAN 50 endpoints are unreachable.',
+  ad: 'AD/DNS service unavailable — authentication and name resolution are degraded.',
+  fids: 'FIDS application unavailable — passenger display updates are paused.',
+  cctv: 'CCTV/NVR service unavailable — camera recording is degraded.',
+  nms: 'NMS/Zabbix unavailable — monitoring visibility is reduced.',
+  backup: 'Backup node unavailable — scheduled protection jobs are paused.'
+};
+const labLatency = document.querySelector('#lab-latency');
+const labLoss = document.querySelector('#lab-loss');
+const labPackets = document.querySelector('#lab-packets');
+let labReplayTimer;
+const gameObjective = document.querySelector('#game-objective');
+const gameGuidance = document.querySelector('#game-guidance');
+const gameScore = document.querySelector('#game-score');
+const gameTime = document.querySelector('#game-time');
+const startMission = document.querySelector('#start-mission');
+const missionSequence = ['edge', 'firewall', 'server', 'dhcp'];
+let missionIndex = -1;
+let missionScore = 0;
+let missionSeconds = 90;
+let missionTimer;
+const missionLabels = { edge: 'Triage the unreachable edge router and recover OSPF adjacency.', firewall: 'Validate the Sophos HA state and restore secure traffic.', server: 'Recover the airport server farm without touching the network fabric.', dhcp: 'Restore DHCP/NTP so affected clients can rejoin the network.' };
+const missionGuidance = {
+  edge: 'Symptom: external routes are missing. Check reachability and restore the routing edge first.',
+  firewall: 'Symptom: secure-zone traffic is degraded. Fail over the standby unit and preserve policy continuity.',
+  server: 'Symptom: AD and FIDS are unavailable. Restore services, not switches, to limit the blast radius.',
+  dhcp: 'Symptom: new clients have APIPA addresses. Restore address assignment and time synchronization.'
+};
+const finishMission = (message) => {
+  clearInterval(missionTimer);
+  if (gameObjective) gameObjective.textContent = message;
+  if (gameGuidance) gameGuidance.textContent = 'Training outcome: correlate symptoms, choose the smallest safe action, and verify recovery.';
+  if (startMission) startMission.textContent = 'Replay mission ↻';
+};
+const startMissionGame = () => {
+  clearInterval(missionTimer);
+  failureState.clear();
+  missionIndex = 0;
+  missionScore = 0;
+  missionSeconds = 90;
+  if (gameScore) gameScore.textContent = '0';
+  if (gameTime) gameTime.textContent = '90s';
+  failureState.add(missionSequence[missionIndex]);
+  if (gameObjective) gameObjective.textContent = `INCIDENT 1 / 4 — ${missionLabels[missionSequence[missionIndex]]}`;
+  if (gameGuidance) gameGuidance.textContent = missionGuidance[missionSequence[missionIndex]];
+  renderFailureState();
+  missionTimer = setInterval(() => {
+    missionSeconds -= 1;
+    if (gameTime) gameTime.textContent = `${missionSeconds}s`;
+    if (missionSeconds <= 0) {
+      finishMission(`MISSION FAILED — ${missionScore} points. Restore the lab and try again.`);
+      renderFailureState();
+    }
+  }, 1000);
 };
 const renderFailureState = () => {
   document.querySelectorAll('.failure-node').forEach((node) => node.classList.toggle('is-failed', failureState.has(node.dataset.node)));
   document.querySelectorAll('.failure-link').forEach((link) => {
-    const failed = [...failureState].some((fault) => link.classList.contains(failureLinks[fault]));
+    const failed = [...failureState].some((fault) => (failureLinks[fault] || []).some((name) => link.classList.contains(name)));
     link.style.opacity = failed ? '0.18' : '1';
     link.style.background = failed ? '#ff806d' : '';
   });
@@ -184,6 +257,9 @@ const renderFailureState = () => {
     health.textContent = failureState.size ? `● ${failureState.size} ACTIVE FAULT${failureState.size > 1 ? 'S' : ''}` : '● NOMINAL';
     health.style.color = failureState.size ? '#ff806d' : '';
   }
+  const severity = [...failureState].reduce((total, fault) => total + (fault === 'traffic' ? 2.5 : fault === 'stp' ? 1.8 : 0.7), 0);
+  if (labLatency) labLatency.textContent = `${(2.4 + severity * 4 + Math.random() * 1.6).toFixed(1)}ms`;
+  if (labLoss) labLoss.textContent = `${Math.min(18, severity * 1.7 + Math.random() * .7).toFixed(1)}%`;
 };
 document.querySelectorAll('.sim-control[data-fault]').forEach((button) => {
   button.addEventListener('click', () => {
@@ -195,21 +271,66 @@ document.querySelectorAll('.sim-control[data-fault]').forEach((button) => {
   });
 });
 document.querySelector('#reset-failures')?.addEventListener('click', () => {
+  clearInterval(missionTimer);
+  missionIndex = -1;
   failureState.clear();
   const log = document.querySelector('#failure-log');
   if (log) log.textContent = '[recovery] All devices restored. Links healthy and services nominal.';
   renderFailureState();
 });
-document.querySelectorAll('.failure-node').forEach((node) => {
-  node.addEventListener('click', () => {
+startMission?.addEventListener('click', startMissionGame);
+const toggleFailure = (node) => {
     const fault = node.dataset.node;
     if (fault === 'core') return;
-    failureState.has(fault) ? failureState.delete(fault) : failureState.add(fault);
+    const wasFailed = failureState.has(fault);
+    wasFailed ? failureState.delete(fault) : failureState.add(fault);
+    if (wasFailed && missionIndex >= 0 && fault === missionSequence[missionIndex]) {
+      missionScore += Math.max(100, missionSeconds * 5);
+      missionIndex += 1;
+      if (gameScore) gameScore.textContent = String(missionScore);
+      if (missionIndex >= missionSequence.length) {
+        finishMission(`MISSION COMPLETE — ${missionScore} points. Airport services stabilized.`);
+      } else {
+        const nextFault = missionSequence[missionIndex];
+        failureState.add(nextFault);
+        if (gameObjective) gameObjective.textContent = `INCIDENT ${missionIndex + 1} / 4 — ${missionLabels[nextFault]}`;
+        if (gameGuidance) gameGuidance.textContent = missionGuidance[nextFault];
+      }
+    }
     const log = document.querySelector('#failure-log');
     if (log) log.textContent = failureState.has(fault) ? `[alert] ${failureMessages[fault]}` : `[recovery] ${node.textContent.split('\n')[0]} restored.`;
     renderFailureState();
-  });
+};
+document.querySelectorAll('.failure-node').forEach((node) => {
+  node.addEventListener('click', () => toggleFailure(node));
+  node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleFailure(node); } });
 });
+document.querySelector('#run-traffic-test')?.addEventListener('click', () => {
+  const log = document.querySelector('#failure-log');
+  if (log) log.textContent = '[trace] 10.0.0.1 → DIST-A → SW-02 → FIDS APP\n[reply] 4 packets transmitted, 4 received, 0.0% loss\n[result] Simulated path healthy.';
+  if (labPackets) labPackets.textContent = `${(1842 + Math.floor(Math.random() * 240)).toLocaleString()}`;
+});
+document.querySelector('#replay-incident')?.addEventListener('click', () => {
+  clearInterval(labReplayTimer);
+  const sequence = ['link', 'dhcp', 'traffic'];
+  let step = 0;
+  failureState.clear();
+  labReplayTimer = setInterval(() => {
+    if (step >= sequence.length) { clearInterval(labReplayTimer); return; }
+    const fault = sequence[step++];
+    failureState.add(fault);
+    const log = document.querySelector('#failure-log');
+    if (log) log.textContent = `[replay ${step}/3] ${failureMessages[fault]}\n[action] Observe telemetry, isolate scope, restore safely.`;
+    renderFailureState();
+  }, 850);
+});
+setInterval(() => {
+  if (!labPackets) return;
+  const activePenalty = [...failureState].length;
+  labPackets.textContent = `${(1842 + Math.floor(Math.random() * 240)).toLocaleString()}`;
+  if (labLatency) labLatency.textContent = `${(2.4 + activePenalty * 1.8 + Math.random() * 1.2).toFixed(1)}ms`;
+  if (labLoss && !failureState.has('traffic')) labLoss.textContent = `${(activePenalty * .4 + Math.random() * .3).toFixed(1)}%`;
+}, 1400);
 
 const WEB3FORMS_ACCESS_KEY = '0cf72841-5646-4255-8636-320e160e44b8';
 
