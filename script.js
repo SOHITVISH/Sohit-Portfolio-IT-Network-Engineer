@@ -190,15 +190,40 @@ document.querySelectorAll('.failure-node').forEach((node) => {
   });
 });
 
-document.querySelector('#contact-form')?.addEventListener('submit', (event) => {
+const WEB3FORMS_ACCESS_KEY = '0cf72841-5646-4255-8636-320e160e44b8';
+
+document.querySelector('#contact-form')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
   const name = form.querySelector('[name="name"]').value.trim();
   const email = form.querySelector('[name="email"]').value.trim();
   const message = form.querySelector('[name="message"]').value.trim();
-  const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
-  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-  window.location.href = `mailto:isohitv@gmail.com?subject=${subject}&body=${body}`;
   const status = document.querySelector('#form-status');
-  if (status) status.textContent = 'Opening your email client…';
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (WEB3FORMS_ACCESS_KEY === 'PASTE_WEB3FORMS_ACCESS_KEY_HERE') {
+    if (status) status.textContent = 'Contact form setup is incomplete. Add the Web3Forms access key.';
+    return;
+  }
+  const payload = new FormData(form);
+  payload.append('access_key', WEB3FORMS_ACCESS_KEY);
+  payload.append('subject', `Portfolio enquiry from ${name}`);
+  payload.append('from_name', 'Sohit Portfolio');
+  if (submitButton) submitButton.disabled = true;
+  if (status) status.textContent = 'Sending securely…';
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: payload,
+      headers: { Accept: 'application/json' }
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.message || 'Message delivery failed.');
+    form.reset();
+    if (status) status.textContent = 'Message sent successfully. Thank you for reaching out.';
+  } catch (error) {
+    if (status) status.textContent = 'Message could not be sent. Please try again.';
+    console.error('Contact form submission failed:', error);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
 });
