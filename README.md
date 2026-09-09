@@ -12,7 +12,9 @@ My current work supports Maharishi Valmiki International Airport, Ayodhya Dham, 
 - 55+ Ruckus wireless access points
 - Sophos Active/Standby Firewall HA
 - 300+ Honeywell CCTV cameras
+- DVR / NVR / VMS surveillance operations
 - FIDS, access control and public address systems
+- PA systems, EPABX / telephony and ISP coordination
 - Linux and Windows Server infrastructure
 - Active Directory and PowerShell administration
 - 24/7 NOC monitoring, incident response and RCA

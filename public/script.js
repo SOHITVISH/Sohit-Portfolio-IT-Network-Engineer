@@ -464,8 +464,16 @@ document.querySelector('#replay-theatre-run')?.addEventListener('click', () => {
 const radarData = {
   routing: ['ROUTING & SWITCHING', 'Project: MVI Airport Network Deployment', 'Cisco Catalyst · OSPF · VLAN · STP/RSTP'],
   security: ['SECURITY & VPN', 'Case study: Sophos Firewall HA and secure airport zones', 'Sophos · FortiGate · IPsec · NAT · IPS'],
-  automation: ['AUTOMATION', 'Project: Repeatable network backup and compliance workflow', 'Python · Netmiko · NAPALM · Ansible · Git'],
-  noc: ['NOC OPERATIONS', 'Case study: 24/7 airport monitoring and incident response', 'Infron NMS · Zabbix · Wireshark · RCA']
+  automation: ['NETWORK AUTOMATION', 'Project: Repeatable network backup and compliance workflow', 'Python · Netmiko · NAPALM · Ansible · Git'],
+  cloud: ['CLOUD NETWORKING', 'Lab track: Designing secure AWS VPC foundations for hybrid growth', 'AWS VPC · EC2 · IAM · Security Groups · Route Tables'],
+  observability: ['OBSERVABILITY', 'Case study: Turning live telemetry into faster incident triage', 'Infron NMS · Zabbix · SolarWinds · Logs · Wireshark'],
+  identity: ['IDENTITY & NAC', 'Case study: Controlled access across airport users, devices and wireless zones', 'Active Directory · Group Policy · 802.1X · RADIUS · WPA2-Enterprise'],
+  noc: ['NOC OPERATIONS', 'Case study: 24/7 airport monitoring and incident response', 'Infron NMS · Zabbix · Wireshark · RCA · ITIL'],
+  iac: ['NETWORK AS CODE', 'Project: Versioned, reviewable changes for repeatable infrastructure delivery', 'Ansible · YAML · Git/GitHub · REST APIs · Rollback thinking'],
+  'airport-systems': ['AIRPORT IT SYSTEMS', 'Case study: Keeping passenger-facing and operational systems available across airport zones', 'FIDS · Access Control · PA Systems · EPABX · ISP Coordination'],
+  surveillance: ['VIDEO SURVEILLANCE', 'Case study: Supporting 300+ Honeywell CCTV endpoints and recording infrastructure', 'Honeywell CCTV · DVR · NVR · VMS · VLAN Segmentation · Storage Health'],
+  telephony: ['PA & EPABX', 'Case study: Supporting airport announcements, extensions and critical voice communication', 'Public Address · EPABX · SIP / Telephony · Extension Management · Fault Isolation'],
+  isp: ['ISP & WAN OPERATIONS', 'Case study: Managing provider handoffs and WAN availability for zero-downtime operations', 'ISP Escalation · WAN Links · CPE · Routing · Failover · SLA Tracking']
 };
 document.querySelectorAll('.radar-option').forEach((option) => option.addEventListener('click', () => {
   document.querySelectorAll('.radar-option').forEach((item) => item.classList.remove('active'));
