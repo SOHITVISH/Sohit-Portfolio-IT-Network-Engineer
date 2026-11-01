@@ -1,105 +1,254 @@
-const menuButton = document.querySelector('.menu-toggle');
-const nav = document.querySelector('.desktop-nav');
-const networkClock = document.querySelector('#network-clock');
-const packetCount = document.querySelector('#packet-count');
-const throughput = document.querySelector('#throughput');
-const networkLatency = document.querySelector('#network-latency');
-const networkStatus = document.querySelector('#network-status');
-const mapSimulate = document.querySelector('#map-simulate');
-let networkSeconds = 24;
-setInterval(() => {
-  networkSeconds = (networkSeconds + 1) % 3600;
-  if (networkClock) networkClock.firstChild.textContent = `${String(Math.floor(networkSeconds / 60)).padStart(2, '0')}:${String(networkSeconds % 60).padStart(2, '0')} `;
-  if (packetCount) packetCount.textContent = `${(18426 + Math.floor(Math.random() * 180)).toLocaleString()}`;
-  if (throughput) throughput.textContent = `${780 + Math.floor(Math.random() * 140)} Mbps`;
-}, 1200);
-mapSimulate?.addEventListener('click', () => {
-  if (!networkStatus || !networkLatency || !mapSimulate) return;
-  networkStatus.textContent = 'Health check complete · all systems nominal';
-  networkLatency.textContent = `${(2 + Math.random() * 1.2).toFixed(1)}ms`;
-  mapSimulate.textContent = 'CHECK COMPLETE ✓';
-  mapSimulate.classList.add('is-complete');
-  setTimeout(() => { mapSimulate.textContent = 'RUN HEALTH CHECK ↻'; mapSimulate.classList.remove('is-complete'); }, 2200);
+const menuToggle = document.querySelector('.menu-toggle');
+const mainNav = document.querySelector('#main-nav');
+const motionToggle = document.querySelector('.motion-toggle');
+
+menuToggle?.addEventListener('click', () => {
+  const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+  menuToggle.setAttribute('aria-expanded', String(!isOpen));
+  menuToggle.setAttribute('aria-label', isOpen ? 'Open navigation' : 'Close navigation');
+  mainNav?.classList.toggle('is-open', !isOpen);
 });
-const networkCursor = document.querySelector('.network-cursor');
-if (networkCursor && window.matchMedia('(pointer: fine)').matches) {
-  document.addEventListener('pointermove', (event) => {
-    networkCursor.style.setProperty('--cursor-x', `${event.clientX}px`);
-    networkCursor.style.setProperty('--cursor-y', `${event.clientY}px`);
+
+mainNav?.querySelectorAll('a').forEach((link) => {
+  link.addEventListener('click', () => {
+    menuToggle?.setAttribute('aria-expanded', 'false');
+    menuToggle?.setAttribute('aria-label', 'Open navigation');
+    mainNav.classList.remove('is-open');
   });
-  document.addEventListener('pointerdown', () => {
-    networkCursor.classList.remove('is-pulsing');
-    requestAnimationFrame(() => networkCursor.classList.add('is-pulsing'));
-  });
+});
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let motionEnabled = !prefersReducedMotion.matches;
+
+function setMotion(enabled) {
+  motionEnabled = enabled;
+  document.body.classList.toggle('motion-off', !enabled);
+  document.documentElement.classList.toggle('motion-disabled', !enabled);
+  motionToggle?.setAttribute('aria-pressed', String(enabled));
+  motionToggle?.setAttribute('aria-label', enabled ? 'Pause motion effects' : 'Enable motion effects');
+  if (motionToggle) {
+    motionToggle.querySelector('.motion-label').textContent = enabled ? 'Motion on' : 'Motion off';
+    motionToggle.querySelector('.motion-glyph').textContent = enabled ? 'Ⅱ' : '▶';
+  }
 }
 
-menuButton?.addEventListener('click', () => {
-  const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-  menuButton.setAttribute('aria-expanded', String(!isOpen));
-  nav.classList.toggle('mobile-open', !isOpen);
-});
+setMotion(motionEnabled);
+motionToggle?.addEventListener('click', () => setMotion(!motionEnabled));
 
-nav?.querySelectorAll('a').forEach((link) => {
-  link.addEventListener('click', () => {
-    menuButton?.setAttribute('aria-expanded', 'false');
-    nav.classList.remove('mobile-open');
+const scrollProgressFill = document.querySelector('#scroll-progress-fill');
+let scrollProgressQueued = false;
+function updateScrollProgress() {
+  if (!scrollProgressFill) return;
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+  scrollProgressFill.style.transform = `scaleX(${progress})`;
+}
+window.addEventListener('scroll', () => {
+  if (scrollProgressQueued) return;
+  scrollProgressQueued = true;
+  requestAnimationFrame(() => {
+    updateScrollProgress();
+    scrollProgressQueued = false;
+  });
+}, { passive: true });
+window.addEventListener('resize', updateScrollProgress, { passive: true });
+updateScrollProgress();
+
+const revealTargets = document.querySelectorAll(
+  '.intro, .experience, .work, .practice, .impact-block, .approach, .toolkit, .contact, .discipline-explorer, .impact-lead, .impact-details article, .timeline-item, .project-card, .process-list li, .approach-accordion details, .toolkit-card, .console-panel, .packet-panel, .section-kicker, .section-heading-row, .systems-feature, .systems-graphic, .impact-heading, .credentials-grid, .contact-inner, .capability-strip article, .steps-grid article, .zone-coverage, .zone-grid article, .field-notes, .field-note-grid article, .automation-path, .automation-grid article, .modern-path, .modern-grid article, .ops-studio, .studio-card, .studio-alerts, .career-snapshot, .skill-map, .interview-lab'
+);
+
+document.documentElement.classList.add('motion-ready');
+revealTargets.forEach((element) => element.classList.add('reveal'));
+
+if ('IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.01, rootMargin: '0px 0px -5% 0px' });
+  revealTargets.forEach((element) => revealObserver.observe(element));
+} else {
+  revealTargets.forEach((element) => element.classList.add('is-visible'));
+}
+
+const disciplineInfo = {
+  operate: {
+    index: '01 / 03 · OPERATIONS',
+    title: 'Keep airport services moving.',
+    description: 'I monitor connected services through 24/7 NOC workflows, resolve L1/L2 issues, and use packet evidence and RCA to restore service carefully.',
+    tags: ['Infron NMS', 'Wireshark', 'Incident response'],
+    href: '#experience'
+  },
+  protect: {
+    index: '02 / 03 · SECURITY & ACCESS',
+    title: 'Control paths and access.',
+    description: 'I work with Sophos HA, VPN tunnels, firewall policies, wireless access, and Active Directory in a live airport environment.',
+    tags: ['Sophos HA', 'IPsec VPN', 'Active Directory'],
+    href: '#experience'
+  },
+  automate: {
+    index: '03 / 03 · AUTOMATION',
+    title: 'Make repeatable checks routine.',
+    description: 'I built Python, Netmiko, and NAPALM scripts for configuration backups, OSPF checks, and interface reporting. My EVE-NG lab reports 4+ hours saved weekly.',
+    tags: ['Python', 'Netmiko', 'NAPALM'],
+    href: '#work'
+  }
+};
+
+const disciplineButtons = [...document.querySelectorAll('.discipline-button')];
+disciplineButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const key = button.dataset.discipline;
+    const content = disciplineInfo[key];
+    if (!content) return;
+    disciplineButtons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    document.querySelector('#discipline-visual').dataset.mode = key;
+    document.querySelector('#discipline-index').textContent = content.index;
+    document.querySelector('#discipline-title').textContent = content.title;
+    document.querySelector('#discipline-description').textContent = content.description;
+    document.querySelector('#discipline-link').href = content.href;
+    const tags = document.querySelector('#discipline-tags');
+    tags.replaceChildren(...content.tags.map((tag) => {
+      const item = document.createElement('span');
+      item.textContent = tag;
+      return item;
+    }));
   });
 });
 
-const progress = document.querySelector('.scroll-progress');
-let progressFrame = 0;
-const updateScrollProgress = () => {
-  progressFrame = 0;
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  if (progress) progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
-};
-window.addEventListener('scroll', () => {
-  if (!progressFrame) progressFrame = requestAnimationFrame(updateScrollProgress);
-}, { passive: true });
-updateScrollProgress();
-
-document.querySelectorAll('.filter').forEach((button) => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('.filter').forEach((item) => item.classList.remove('active'));
-    button.classList.add('active');
-    const filter = button.dataset.filter;
-    document.querySelectorAll('.project-card').forEach((card) => {
-      card.classList.toggle('is-hidden', filter !== 'all' && card.dataset.category !== filter);
+document.querySelectorAll('.approach-accordion details').forEach((detail) => {
+  detail.addEventListener('toggle', () => {
+    if (!detail.open) return;
+    document.querySelectorAll('.approach-accordion details').forEach((other) => {
+      if (other !== detail) other.open = false;
     });
   });
 });
 
-const cliResponses = {
-  'show version': 'Cisco IOS XE Software, Version 17.09.04\nSW-CORE uptime is 1 year, 184 days\nModel: Catalyst 9300 · image: CAT9K_IOSXE',
-  'show vlan brief': 'VLAN  Name                 Status    Ports\n10    MGMT                 active    Gi1/0/1-4\n20    FIDS                 active    Gi1/0/5-12\n30    CCTV                 active    Gi1/0/13-24\n40    GUEST-WIFI           active    Gi1/0/25-36',
-  'show ip route': 'O    10.0.10.0/24 [110/2] via 10.0.0.2, Vlan10\nO    10.0.20.0/24 [110/2] via 10.0.0.2, Vlan20\nC    10.0.0.0/30 is directly connected, Gi1/1/1\nGateway of last resort is 10.0.0.2',
-  'show interfaces status': 'Port      Name       Status       Vlan  Duplex  Speed\nGi1/0/1   AD-DNS     connected    10    a-full  a-1000\nGi1/0/5   FIDS-APP   connected    20    a-full  a-1000\nGi1/0/13  CCTV-NVR   connected    30    a-full  a-1000\nGi1/1/1   DIST-A     connected    trunk a-full  a-10000',
-  'show spanning-tree': 'VLAN0020\nRoot ID    Priority 24596  Address 00:aa:bb:cc:20:01\nThis bridge is the root\nGi1/1/1  Desg FWD 10  P2p',
-  'ping 10.0.20.15': 'Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 10.0.20.15...\n!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 2/3/5 ms'
+const demoResponses = {
+  'help': 'Supported demo commands:\nshow ip route\nshow vlan brief\nshow ip ospf neighbor\nshow spanning-tree\nping 198.51.100.20\nwhoami\nabout sohit\nshow achievements\nshow certifications\nsudo hire sohit',
+  'whoami': 'Sohit Vishwakarma\nNetwork & IT Infrastructure Engineer\nLucknow, India · Open to relocation across India',
+  'about sohit': 'Network operations · Airport infrastructure · Application support\nI work across reliability, security, monitoring, and practical automation.',
+  'show achievements': '20+ Cisco Catalyst switches supported\n55+ Ruckus wireless APs supported\n50+ Wipro backend incidents/month · 95%+ SLA adherence\n99%+ reported uptime across supported key services',
+  'show certifications': 'Sophos Certified Network Engineer · 2025\nFortiGate Administrator · Fortinet · 2026\nCCNA networking coursework · in progress\nCisco / Google / IBM training listed in Learning',
+  'sudo hire sohit': 'This read-only portfolio terminal cannot run privileged commands.\nTo start a conversation, use the public email link on this page.',
+  'show ip route': 'C  192.0.2.0/24       directly connected, Vlan10\nS  198.51.100.0/24   via 192.0.2.1\nS* 0.0.0.0/0         via 192.0.2.1\n\nSIMULATED ROUTING TABLE · DOCUMENTATION RANGES',
+  'show vlan brief': 'VLAN  Name       Status\n10    MGMT       active\n20    USERS      active\n30    LAB        active\n\nSYNTHETIC VLAN EXAMPLE · NO SITE DATA',
+  'show ip ospf neighbor': 'Neighbor ID     State     Interface\n198.51.100.2    FULL/DR   Gi0/1\n\nSYNTHETIC OSPF ADJACENCY · LAB ONLY',
+  'show spanning-tree': 'VLAN0030\nRoot bridge: LAB-SW-01\nGi0/1  Root FWD  cost 4\nGi0/2  Desg FWD  cost 4\n\nSIMULATED STP STATE',
+  'ping 198.51.100.20': 'Sending 5 ICMP echoes to 198.51.100.20...\n!!!!!\nSuccess rate is 100 percent (5/5)\nRound-trip time: synthetic lab result'
 };
-const runCliCommand = (command) => {
-  const output = document.querySelector('#cli-output');
-  const normalized = command.trim().toLowerCase();
-  if (output) output.textContent = cliResponses[normalized] || `% Invalid input detected at '^' marker.\nTry: show version, show vlan brief, show ip route, ping 10.0.20.15`;
-};
-document.querySelectorAll('.console-actions button').forEach((button) => button.addEventListener('click', () => runCliCommand(button.dataset.command)));
-document.querySelector('#cli-form')?.addEventListener('submit', (event) => {
+
+const consoleOutput = document.querySelector('#console-output');
+const consoleInput = document.querySelector('#console-command');
+function runDemoCommand(command) {
+  if (!consoleOutput) return;
+  const normalized = command.trim().toLowerCase().replace(/\s+/g, ' ');
+  consoleOutput.textContent = demoResponses[normalized] || '% Command not available in this safe demo. Type help to see supported commands.';
+}
+document.querySelectorAll('[data-console-command]').forEach((button) => {
+  button.addEventListener('click', () => runDemoCommand(button.dataset.consoleCommand));
+});
+document.querySelector('#console-form')?.addEventListener('submit', (event) => {
   event.preventDefault();
-  const input = document.querySelector('#cli-input');
-  if (input) { runCliCommand(input.value); input.value = ''; }
+  runDemoCommand(consoleInput?.value || '');
+  if (consoleInput) consoleInput.value = '';
 });
 
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element));
+function updatePacketEndpoints() {
+  const sourceAddress = document.querySelector('#packet-source-address');
+  const destinationAddress = document.querySelector('#packet-destination-address');
+  if (sourceAddress) sourceAddress.textContent = document.querySelector('#packet-source')?.value || '192.0.2.44';
+  if (destinationAddress) destinationAddress.textContent = document.querySelector('#packet-destination')?.value || '198.51.100.15';
+}
+document.querySelector('#packet-source')?.addEventListener('change', updatePacketEndpoints);
+document.querySelector('#packet-destination')?.addEventListener('change', updatePacketEndpoints);
+updatePacketEndpoints();
+const traceButton = document.querySelector('#trace-packet');
+traceButton?.addEventListener('click', () => {
+  const track = document.querySelector('#packet-track');
+  const status = document.querySelector('#packet-status');
+  if (track) {
+    track.classList.remove('is-tracing');
+    requestAnimationFrame(() => track.classList.add('is-tracing'));
+  }
+  const source = document.querySelector('#packet-source')?.selectedOptions[0]?.textContent || 'sample client';
+  const destination = document.querySelector('#packet-destination')?.selectedOptions[0]?.textContent || 'sample service';
+  if (status) status.textContent = `Simulation complete: ${source} → route lookup → policy check → ${destination}. No live systems contacted.`;
+});
 
-const quizQuestions = [
+const impactInfo = {
+  operate: {
+    context: 'LIVE AIRPORT SYSTEMS · REPORTED FIGURE',
+    number: '99', suffix: '%+',
+    title: 'Availability supports the service.',
+    description: 'Reported uptime across FIDS, 300+ CCTV cameras, and access control, supported through proactive monitoring and 24/7 NOC response.',
+    link: '#experience', linkText: 'Read the operations story'
+  },
+  support: {
+    context: 'WIPRO · APPLICATION SUPPORT',
+    number: '50', suffix: '+',
+    title: 'Incidents resolved. Services restored.',
+    description: 'Resolved 50+ backend incidents per month with 95%+ SLA adherence, working with DevOps, development, and QA teams on production issues and root-cause analysis.',
+    link: '#experience', linkText: 'Read the support story'
+  },
+  automate: {
+    context: 'EVE-NG · AUTOMATION LAB · REPORTED ESTIMATE',
+    number: '4+', suffix: 'h',
+    title: 'Repeatable checks return time.',
+    description: 'My lab workflows use Python and Netmiko for configuration backups, OSPF checks, and interface reporting. The time saved is a lab-reported estimate.',
+    link: '#work', linkText: 'Explore the lab work'
+  }
+};
+
+const impactButtons = [...document.querySelectorAll('.impact-button')];
+impactButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const story = impactInfo[button.dataset.impact];
+    if (!story) return;
+    impactButtons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    document.querySelector('#impact-context').textContent = story.context;
+    document.querySelector('#impact-number').innerHTML = `${story.number}<span>${story.suffix}</span>`;
+    document.querySelector('#impact-title').textContent = story.title;
+    document.querySelector('#impact-description').textContent = story.description;
+    const link = document.querySelector('#impact-link');
+    link.href = story.link;
+    link.firstChild.textContent = `${story.linkText} `;
+  });
+});
+
+const filterButtons = [...document.querySelectorAll('.filter-button')];
+const projectCards = [...document.querySelectorAll('.project-card')];
+
+filterButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const filter = button.dataset.filter;
+    filterButtons.forEach((item) => {
+      const selected = item === button;
+      item.classList.toggle('is-active', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    projectCards.forEach((card) => {
+      card.hidden = filter !== 'all' && card.dataset.category !== filter;
+    });
+  });
+});
+
+document.querySelector('#year').textContent = new Date().getFullYear();
+
+const interviewQuestionBank = [
 ['Which OSI layer forwards frames using MAC addresses?',['Physical','Data Link','Network','Transport'],1,'SWITCHING'],['What is the default subnet mask for a Class C network?',['255.0.0.0','255.255.0.0','255.255.255.0','255.255.255.252'],2,'IP FUNDAMENTALS'],['Which protocol resolves IPv4 addresses to MAC addresses?',['DNS','DHCP','ARP','ICMP'],2,'PROTOCOLS'],['What is the loopback IPv4 address?',['127.0.0.1','169.254.1.1','0.0.0.0','255.255.255.255'],0,'IP FUNDAMENTALS'],['Which command tests reachability with ICMP?',['traceroute','ping','nslookup','arp'],1,'TROUBLESHOOTING'],['What does CIDR /24 represent?',['64 addresses','128 addresses','256 addresses','512 addresses'],2,'IP FUNDAMENTALS'],['Which IPv6 prefix is link-local?',['2000::/3','FC00::/7','FE80::/10','FF00::/8'],2,'IP FUNDAMENTALS'],['What is the purpose of a default gateway?',['Assign DNS','Reach remote networks','Encrypt traffic','Block broadcasts'],1,'ROUTING'],['Which address is private RFC1918 space?',['8.8.8.8','172.20.5.1','1.1.1.1','198.51.100.4'],1,'IP FUNDAMENTALS'],['What does DHCP provide?',['Only routing','Automatic network configuration','Encryption keys','MAC filtering'],1,'SERVICES'],
 ['Which VLAN carries untagged traffic on an 802.1Q trunk?',['Voice VLAN','Native VLAN','Management VLAN','Private VLAN'],1,'VLAN'],['Which command shows VLANs on Cisco IOS?',['show ip route','show vlan brief','show cdp','show access-lists'],1,'CISCO IOS'],['What does an access port normally carry?',['Multiple tagged VLANs','One untagged VLAN','Only routed traffic','No traffic'],1,'SWITCHING'],['Which feature prevents rogue DHCP servers?',['DHCP snooping','Port mirroring','BPDU filter','NAT'],0,'SWITCH SECURITY'],['What is a trunk port used for?',['Connect hosts only','Carry multiple VLANs','Disable STP','Assign IP addresses'],1,'VLAN'],['Which VLAN is commonly used for IP phones?',['Native VLAN','Voice VLAN','Blackhole VLAN','Transit VLAN'],1,'VLAN'],['What does 802.1Q add to an Ethernet frame?',['IP header','VLAN tag','TCP flag','MAC address'],1,'VLAN'],['What is inter-VLAN routing?',['Routing within one VLAN','Routing between VLANs','Routing only IPv6','Routing without a gateway'],1,'ROUTING'],['Which command verifies a Cisco interface status?',['show interfaces status','show users','show flash','show clock'],0,'CISCO IOS'],['What is a broadcast domain?',['Devices sharing broadcasts','A single cable','A routing protocol','A VPN tunnel'],0,'SWITCHING'],
 ['What problem does STP prevent?',['IP conflicts','Layer 2 loops','DNS failure','Packet encryption'],1,'STP'],['Which switch becomes STP root based on the lowest bridge ID?',['Root bridge','Designated router','Backup server','DHCP relay'],0,'STP'],['RSTP is standardized as which IEEE protocol?',['802.1X','802.1D','802.1w','802.3ad'],2,'STP'],['What does PortFast do?',['Speeds host port forwarding','Encrypts a port','Bundles links','Blocks BPDUs'],0,'STP'],['Which STP feature protects against unexpected BPDUs on edge ports?',['BPDU Guard','Root Guard','Loop Guard','UDLD'],0,'STP'],['What is EtherChannel used for?',['Link aggregation','Address translation','VLAN pruning','Route encryption'],0,'SWITCHING'],['Which protocol negotiates Cisco EtherChannel?',['LACP only','PAgP','OSPF','VTP'],1,'SWITCHING'],['What can cause a MAC address flapping alert?',['Layer 2 loop','Correct routing','DNS cache','Low CPU'],0,'TROUBLESHOOTING'],['Which command shows the MAC address table?',['show mac address-table','show ip arp','show cdp neighbors','show spanning-tree root'],0,'CISCO IOS'],['What does storm control limit?',['Broadcast or multicast traffic','CPU temperature','Routing updates','User passwords'],0,'SWITCH SECURITY'],
@@ -115,516 +264,245 @@ const quizQuestions = [
 ['Which command shows the Cisco routing table?',['show ip route','show vlan brief','show users','show version'],0,'CISCO IOS'],['Which Cisco command shows OSPF neighbors?',['show ip ospf neighbor','show ip bgp','show cdp entry','show interfaces counters'],0,'OSPF'],['What does show running-config display?',['Active configuration in RAM','Startup config only','MAC addresses','Flash files'],0,'CISCO IOS'],['What does copy running-config startup-config do?',['Save active config for reboot','Reload the switch','Clear counters','Start DHCP'],0,'CISCO IOS'],['What is the Cisco enable secret for?',['Privileged EXEC authentication','VLAN tagging','SNMP polling','NTP'],0,'CISCO IOS'],['Which command enters interface configuration mode?',['interface GigabitEthernet0/1','router ospf 1','enable secret','line vty'],0,'CISCO IOS'],['What does shutdown on an interface do?',['Administratively disables it','Clears its MAC','Changes its VLAN','Starts OSPF'],0,'CISCO IOS'],['What does no shutdown do?',['Enables an interface administratively','Deletes the interface','Removes its IP','Disables STP'],0,'CISCO IOS'],['Which Cisco feature mirrors traffic for analysis?',['SPAN','PAT','VTP','HSRP'],0,'TROUBLESHOOTING'],['What does HSRP provide?',['First-hop gateway redundancy','Wireless encryption','DNS failover','Packet capture'],0,'HIGH AVAILABILITY'],
 ['What is a health check in incident response?',['A targeted test to confirm service state','A certificate type','A VLAN tag','A database schema'],0,'TROUBLESHOOTING'],['What is the first step when a user reports no connectivity?',['Scope and gather symptoms','Reboot everything','Delete the VLAN','Disable monitoring'],0,'TROUBLESHOOTING'],['Why compare a working and failing path?',['Isolate the difference','Increase noise','Skip evidence','Change all devices'],0,'TROUBLESHOOTING'],['What does packet loss mean?',['Packets fail to reach the destination','DNS is always broken','The cable is always cut','The firewall is always down'],0,'TROUBLESHOOTING'],['What can duplex mismatch cause?',['Errors and poor performance','Better throughput','New VLANs','Faster DNS'],0,'TROUBLESHOOTING'],['What does CRC errors often suggest?',['Physical layer or cabling issue','Correct routing','Good optics','A DNS alias'],0,'TROUBLESHOOTING'],['What is escalation management?',['Moving an issue to the right support level','Deleting an incident','Changing a MAC address','Disabling an SLA'],0,'NOC'],['What is a maintenance rollback plan?',['Steps to restore the previous state','A new VLAN design','A user survey','A DNS record'],0,'CHANGE MANAGEMENT'],['What does SLA adherence measure?',['Whether service targets are met','Number of VLANs','Cable length','CPU model'],0,'ITSM'],['Why close an incident with documentation?',['Preserve knowledge and audit history','Hide the outage','Remove root cause','Disable future alerts'],0,'ITSM']
 ];
-const quiz = { index: 0, score: 0, streak: 0, answered: false, order: [] };
-const questionEl = document.querySelector('#game-question');
-const optionsEl = document.querySelector('#quiz-options');
-const progressEl = document.querySelector('#game-progress');
-const scoreEl = document.querySelector('#game-score');
-const streakEl = document.querySelector('#game-streak');
-const categoryEl = document.querySelector('#game-category');
-const statusEl = document.querySelector('#game-status');
-const difficultyEl = document.querySelector('#game-difficulty');
-const messageEl = document.querySelector('#game-message');
-const shuffle = (items) => items.map((item) => [Math.random(), item]).sort((a, b) => a[0] - b[0]).map((item) => item[1]);
-const renderQuestion = () => {
-  const item = quizQuestions[quiz.order[quiz.index]];
-  quiz.answered = false;
-  questionEl.textContent = item[0];
-  categoryEl.textContent = item[3];
-  difficultyEl.textContent = quiz.index % 3 === 0 ? 'SCENARIO' : 'INTERVIEW LEVEL';
-  progressEl.textContent = `${quiz.index + 1} / 10`;
-  messageEl.textContent = 'Choose the best answer.';
-  optionsEl.innerHTML = '';
-  shuffle(item[1].map((answer, answerIndex) => ({ answer, answerIndex }))).forEach(({ answer, answerIndex }) => {
-    const button = document.createElement('button');
-    button.className = 'quiz-option';
-    button.innerHTML = `<span>${String.fromCharCode(65 + answerIndex)}</span>${answer}`;
-    button.addEventListener('click', () => answerQuestion(button, answerIndex, item[2]));
-    optionsEl.appendChild(button);
-  });
-};
-const answerQuestion = (button, answerIndex, correctIndex) => {
-  if (quiz.answered) return;
-  quiz.answered = true;
-  const buttons = [...optionsEl.querySelectorAll('button')];
-  buttons.forEach((item) => { item.disabled = true; });
-  if (answerIndex === correctIndex) {
-    button.classList.add('correct');
-    quiz.score += 10 + quiz.streak * 2;
-    quiz.streak += 1;
-    messageEl.textContent = 'Correct — strong engineering instinct. Next question loading...';
-    statusEl.textContent = 'ANSWER ACCEPTED';
-  } else {
-    button.classList.add('incorrect');
-    buttons.find((item) => item.textContent.slice(1) === quizQuestions[quiz.order[quiz.index]][1][correctIndex])?.classList.add('correct');
-    quiz.streak = 0;
-    messageEl.textContent = `Not quite. Correct answer: ${quizQuestions[quiz.order[quiz.index]][1][correctIndex]}`;
-    statusEl.textContent = 'REVIEW REQUIRED';
-  }
-  scoreEl.textContent = quiz.score;
-  streakEl.textContent = quiz.streak;
-  setTimeout(() => { quiz.index += 1; if (quiz.index >= 10) finishQuiz(); else renderQuestion(); }, 1100);
-};
-const finishQuiz = () => {
-  questionEl.textContent = `Session complete — ${quiz.score} points`;
-  categoryEl.textContent = 'RESULTS';
-  difficultyEl.textContent = '10 RANDOM QUESTIONS';
-  optionsEl.innerHTML = '<div class="quiz-result">You completed a randomized interview set. Reset to test another route through the 100-question bank.</div>';
-  progressEl.textContent = '10 / 10';
-  statusEl.textContent = 'SESSION COMPLETE';
-  messageEl.textContent = 'New session is ready when you are.';
-};
-const newQuiz = () => { quiz.index = 0; quiz.score = 0; quiz.streak = 0; quiz.order = shuffle([...Array(quizQuestions.length).keys()]); scoreEl.textContent = '0'; streakEl.textContent = '0'; renderQuestion(); };
-document.querySelector('#game-reset')?.addEventListener('click', newQuiz);
-if (questionEl && optionsEl) newQuiz();
 
-const failureState = new Set();
-const failureLinks = { edge: ['link-core-edge'], firewall: ['link-core-fw'], wireless: ['link-core-ap'], server: ['link-core-server', 'link-dist-a-servers', 'link-dist-b-servers'], link: ['link-core-dist-a', 'link-core-dist-b'], stp: ['link-dist-a-access-a', 'link-dist-a-access-b', 'link-dist-b-access-c', 'link-dist-b-access-d'], dhcp: ['link-dist-a-servers'], traffic: [] };
-const failureMessages = {
-  edge: 'Edge router unreachable — OSPF adjacency lost. Traffic is rerouting through the backup path.',
-  firewall: 'Firewall isolated — Sophos HA failover required. Secure zones are currently degraded.',
-  wireless: 'Wireless controller unavailable — Ruckus AP clients are offline. Wired services remain nominal.',
-  server: 'Server farm stopped — AD and FIDS dependencies are unavailable. Network fabric remains healthy.',
-  link: 'Distribution trunk degraded — traffic is taking the alternate path with increased latency.',
-  stp: 'STP loop detected — broadcast protection is converging and access ports are rate-limited.',
-  dhcp: 'DHCP/NTP service unavailable — new clients are receiving APIPA addresses until recovery.',
-  traffic: 'Traffic spike injected — simulated throughput is above threshold and packet loss is rising.',
-  'dist-a': 'DIST-A unavailable — VLAN gateways are reconverging through DIST-B.',
-  'dist-b': 'DIST-B unavailable — redundant gateway path is carrying the simulated load.',
-  wlc: 'Wireless controller unavailable — Ruckus APs are isolated from the management plane.',
-  lb: 'Load balancer unhealthy — FIDS web sessions are draining to the backup pool.',
-  'access-a': 'SW-01 access switch offline — VLAN 20 endpoints are unreachable.',
-  'access-b': 'SW-02 access switch offline — VLAN 30 endpoints are unreachable.',
-  'access-c': 'SW-03 access switch offline — VLAN 40 endpoints are unreachable.',
-  'access-d': 'SW-04 access switch offline — VLAN 50 endpoints are unreachable.',
-  ad: 'AD/DNS service unavailable — authentication and name resolution are degraded.',
-  fids: 'FIDS application unavailable — passenger display updates are paused.',
-  cctv: 'CCTV/NVR service unavailable — camera recording is degraded.',
-  nms: 'NMS/Zabbix unavailable — monitoring visibility is reduced.',
-  backup: 'Backup node unavailable — scheduled protection jobs are paused.'
+
+const studioTriage = {
+  ospf: 'Check peer reachability and interface state; confirm area, timers, authentication, and adjacency logs; compare route changes before acting.',
+  dhcp: 'Confirm the client VLAN and link; inspect the scope and relay path; check service reachability; validate with a sample lease in the lab.',
+  wifi: 'Check SSID and authentication service status; review AP and client logs; compare a working client; verify VLAN mapping and signal conditions.',
+  cctv: 'Check the camera path and switch port; review PoE and link status; confirm VLAN reachability and VMS registration in a lab example.',
+  fids: 'Check the display endpoint and application health; trace DNS and network reachability; compare timestamps and upstream service status.'
 };
-const labLatency = document.querySelector('#lab-latency');
-const labLoss = document.querySelector('#lab-loss');
-const labPackets = document.querySelector('#lab-packets');
-let labReplayTimer;
-const gameObjective = document.querySelector('#game-objective');
-const gameGuidance = document.querySelector('#game-guidance');
-const gameScore = document.querySelector('#game-score');
-const gameTime = document.querySelector('#game-time');
-const startMission = document.querySelector('#start-mission');
-const missionSequence = ['edge', 'firewall', 'server', 'dhcp'];
-let missionIndex = -1;
-let missionScore = 0;
-let missionSeconds = 90;
-let missionTimer;
-const missionLabels = { edge: 'Triage the unreachable edge router and recover OSPF adjacency.', firewall: 'Validate the Sophos HA state and restore secure traffic.', server: 'Recover the airport server farm without touching the network fabric.', dhcp: 'Restore DHCP/NTP so affected clients can rejoin the network.' };
-const missionGuidance = {
-  edge: 'Symptom: external routes are missing. Check reachability and restore the routing edge first.',
-  firewall: 'Symptom: secure-zone traffic is degraded. Fail over the standby unit and preserve policy continuity.',
-  server: 'Symptom: AD and FIDS are unavailable. Restore services, not switches, to limit the blast radius.',
-  dhcp: 'Symptom: new clients have APIPA addresses. Restore address assignment and time synchronization.'
-};
-const finishMission = (message) => {
-  clearInterval(missionTimer);
-  if (gameObjective) gameObjective.textContent = message;
-  if (gameGuidance) gameGuidance.textContent = 'Training outcome: correlate symptoms, choose the smallest safe action, and verify recovery.';
-  if (startMission) startMission.textContent = 'Replay mission ↻';
-};
-const startMissionGame = () => {
-  clearInterval(missionTimer);
-  failureState.clear();
-  missionIndex = 0;
-  missionScore = 0;
-  missionSeconds = 90;
-  if (gameScore) gameScore.textContent = '0';
-  if (gameTime) gameTime.textContent = '90s';
-  failureState.add(missionSequence[missionIndex]);
-  if (gameObjective) gameObjective.textContent = `INCIDENT 1 / 4 — ${missionLabels[missionSequence[missionIndex]]}`;
-  if (gameGuidance) gameGuidance.textContent = missionGuidance[missionSequence[missionIndex]];
-  renderFailureState();
-  missionTimer = setInterval(() => {
-    missionSeconds -= 1;
-    if (gameTime) gameTime.textContent = `${missionSeconds}s`;
-    if (missionSeconds <= 0) {
-      finishMission(`MISSION FAILED — ${missionScore} points. Restore the lab and try again.`);
-      renderFailureState();
-    }
-  }, 1000);
-};
-const renderFailureState = () => {
-  document.querySelectorAll('.failure-node').forEach((node) => node.classList.toggle('is-failed', failureState.has(node.dataset.node)));
-  document.querySelectorAll('.failure-link').forEach((link) => {
-    const failed = [...failureState].some((fault) => (failureLinks[fault] || []).some((name) => link.classList.contains(name)));
-    link.style.opacity = failed ? '0.18' : '1';
-    link.style.background = failed ? '#ff806d' : '';
-  });
-  const health = document.querySelector('#failure-health');
-  if (health) {
-    health.textContent = failureState.size ? `● ${failureState.size} ACTIVE FAULT${failureState.size > 1 ? 'S' : ''}` : '● NOMINAL';
-    health.style.color = failureState.size ? '#ff806d' : '';
-  }
-  const severity = [...failureState].reduce((total, fault) => total + (fault === 'traffic' ? 2.5 : fault === 'stp' ? 1.8 : 0.7), 0);
-  if (labLatency) labLatency.textContent = `${(2.4 + severity * 4 + Math.random() * 1.6).toFixed(1)}ms`;
-  if (labLoss) labLoss.textContent = `${Math.min(18, severity * 1.7 + Math.random() * .7).toFixed(1)}%`;
-};
-document.querySelectorAll('.sim-control[data-fault]').forEach((button) => {
+document.querySelector('#triage-run')?.addEventListener('click', () => {
+  const symptom = document.querySelector('#triage-symptom')?.value;
+  const output = document.querySelector('#triage-output');
+  if (output) output.textContent = `SAMPLE TRIAGE · ${studioTriage[symptom] || 'Choose a symptom to view checks.'}`;
+});
+
+document.querySelectorAll('[data-scenario]').forEach((button) => {
   button.addEventListener('click', () => {
-    const fault = button.dataset.fault;
-    failureState.add(fault);
-    const log = document.querySelector('#failure-log');
-    if (log) log.textContent = `[alert] ${failureMessages[fault]}\n[action] Investigate telemetry, isolate scope, restore safely.`;
-    renderFailureState();
+    const scenarios = {
+      uplink: 'Simulated uplink event: compare interface state, counters, and the alternate path before recovery.',
+      dhcp: 'Simulated DHCP event: validate VLAN membership, relay, scope capacity, and service reachability.',
+      loop: 'Simulated loop warning: inspect STP state and recent topology changes; do not disable protections blindly.'
+    };
+    const output = document.querySelector('#scenario-output');
+    if (output) output.textContent = scenarios[button.dataset.scenario] || 'Sample event selected.';
   });
 });
-document.querySelector('#reset-failures')?.addEventListener('click', () => {
-  clearInterval(missionTimer);
-  missionIndex = -1;
-  failureState.clear();
-  const log = document.querySelector('#failure-log');
-  if (log) log.textContent = '[recovery] All devices restored. Links healthy and services nominal.';
-  renderFailureState();
-});
-startMission?.addEventListener('click', startMissionGame);
-const toggleFailure = (node) => {
-    const fault = node.dataset.node;
-    if (fault === 'core') return;
-    const wasFailed = failureState.has(fault);
-    wasFailed ? failureState.delete(fault) : failureState.add(fault);
-    if (wasFailed && missionIndex >= 0 && fault === missionSequence[missionIndex]) {
-      missionScore += Math.max(100, missionSeconds * 5);
-      missionIndex += 1;
-      if (gameScore) gameScore.textContent = String(missionScore);
-      if (missionIndex >= missionSequence.length) {
-        finishMission(`MISSION COMPLETE — ${missionScore} points. Airport services stabilized.`);
-      } else {
-        const nextFault = missionSequence[missionIndex];
-        failureState.add(nextFault);
-        if (gameObjective) gameObjective.textContent = `INCIDENT ${missionIndex + 1} / 4 — ${missionLabels[nextFault]}`;
-        if (gameGuidance) gameGuidance.textContent = missionGuidance[nextFault];
-      }
-    }
-    const log = document.querySelector('#failure-log');
-    if (log) log.textContent = failureState.has(fault) ? `[alert] ${failureMessages[fault]}` : `[recovery] ${node.textContent.split('\n')[0]} restored.`;
-    renderFailureState();
-};
-document.querySelectorAll('.failure-node').forEach((node) => {
-  node.addEventListener('click', () => toggleFailure(node));
-  node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleFailure(node); } });
-});
-document.querySelector('#run-traffic-test')?.addEventListener('click', () => {
-  const log = document.querySelector('#failure-log');
-  if (log) log.textContent = '[trace] 10.0.0.1 → DIST-A → SW-02 → FIDS APP\n[reply] 4 packets transmitted, 4 received, 0.0% loss\n[result] Simulated path healthy.';
-  if (labPackets) labPackets.textContent = `${(1842 + Math.floor(Math.random() * 240)).toLocaleString()}`;
-});
-document.querySelector('#replay-incident')?.addEventListener('click', () => {
-  clearInterval(labReplayTimer);
-  const sequence = ['link', 'dhcp', 'traffic'];
-  let step = 0;
-  failureState.clear();
-  labReplayTimer = setInterval(() => {
-    if (step >= sequence.length) { clearInterval(labReplayTimer); return; }
-    const fault = sequence[step++];
-    failureState.add(fault);
-    const log = document.querySelector('#failure-log');
-    if (log) log.textContent = `[replay ${step}/3] ${failureMessages[fault]}\n[action] Observe telemetry, isolate scope, restore safely.`;
-    renderFailureState();
-  }, 850);
-});
-setInterval(() => {
-  if (!labPackets) return;
-  const activePenalty = [...failureState].length;
-  labPackets.textContent = `${(1842 + Math.floor(Math.random() * 240)).toLocaleString()}`;
-  if (labLatency) labLatency.textContent = `${(2.4 + activePenalty * 1.8 + Math.random() * 1.2).toFixed(1)}ms`;
-  if (labLoss && !failureState.has('traffic')) labLoss.textContent = `${(activePenalty * .4 + Math.random() * .3).toFixed(1)}%`;
-}, 1400);
 
-const copilotPlans = {
-  ospf: { severity: 'P1 · HIGH', confidence: '92%', lines: ['[signal] OSPF neighbors dropped', '[likely cause] WAN/interface, MTU or authentication mismatch', '[triage] show ip ospf neighbor → show interfaces → ping next hop', '[action] Restore the smallest failed link, then verify adjacency and routes.'], evidence: ['Neighbor state and last reset reason', 'Interface errors, MTU and authentication', 'Next-hop reachability and route table'] },
-  dhcp: { severity: 'P1 · HIGH', confidence: '89%', lines: ['[signal] Clients have 169.254.x.x addresses', '[likely cause] DHCP scope, relay or server reachability', '[triage] show ip interface → verify helper-address → test DHCP server', '[action] Restore DHCP/NTP service, renew one client, then monitor the scope.'], evidence: ['Client lease and DHCP scope health', 'Relay/helper-address on the SVI', 'Server reachability and service logs'] },
-  wifi: { severity: 'P2 · MEDIUM', confidence: '86%', lines: ['[signal] Ruckus clients fail authentication', '[likely cause] WLC/RADIUS path or VLAN assignment', '[triage] check AP join state → test RADIUS → validate WLAN VLAN', '[action] Recover control-plane access before changing wireless policy.'], evidence: ['AP join and controller reachability', 'RADIUS response and shared-secret status', 'WLAN-to-VLAN assignment and DHCP'] },
-  cctv: { severity: 'P1 · HIGH', confidence: '88%', lines: ['[signal] Multiple cameras unreachable', '[likely cause] CCTV VLAN, PoE/access switch or NVR path', '[triage] test gateway → inspect switch port/PoE → verify NVR service', '[action] Isolate one zone and restore service without disturbing FIDS.'], evidence: ['Affected camera zone and switch ports', 'PoE budget and access VLAN state', 'NVR reachability and recording status'] },
-  fids: { severity: 'P1 · HIGH', confidence: '84%', lines: ['[signal] Passenger displays are stale', '[likely cause] FIDS app, DNS or upstream service path', '[triage] ping app → resolve DNS → inspect service health and logs', '[action] Recover the application dependency, then confirm display updates.'], evidence: ['Display heartbeat and application queue', 'DNS resolution from the FIDS VLAN', 'Upstream service logs and timestamps'] }
-};
-const renderCopilotPlan = () => {
-  const signal = document.querySelector('#copilot-symptom')?.value;
-  const plan = copilotPlans[signal];
-  const output = document.querySelector('#copilot-output');
-  const severity = document.querySelector('#copilot-severity');
-  const confidence = document.querySelector('#copilot-confidence');
-  const evidence = document.querySelector('#copilot-evidence');
-  if (!plan) return;
-  if (output) output.textContent = plan.lines.join('\n');
-  if (severity) severity.textContent = `SEVERITY ${plan.severity}`;
-  if (confidence) confidence.textContent = `CONFIDENCE ${plan.confidence}`;
-  if (evidence) evidence.innerHTML = plan.evidence.map((item) => `<span>□ ${item}</span>`).join('');
-};
-document.querySelector('#copilot-run')?.addEventListener('click', renderCopilotPlan);
-document.querySelector('#copilot-symptom')?.addEventListener('change', renderCopilotPlan);
-
-const commandMode = document.querySelector('#command-mode');
-commandMode?.addEventListener('click', () => {
-  document.body.classList.toggle('command-mode-active');
-  commandMode.textContent = document.body.classList.contains('command-mode-active') ? 'Exit command center Esc' : 'Enter full-screen mode ⛶';
-  if (document.body.classList.contains('command-mode-active')) document.querySelector('#command-center')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && document.body.classList.contains('command-mode-active')) {
-    document.body.classList.remove('command-mode-active');
-    if (commandMode) commandMode.textContent = 'Enter full-screen mode ⛶';
-  }
-});
-document.querySelectorAll('.alert-row').forEach((row) => row.addEventListener('click', () => {
-  document.querySelectorAll('.alert-row').forEach((item) => item.classList.remove('active'));
-  row.classList.add('active');
-  const status = document.querySelector('#command-status');
-  if (status) status.textContent = `[selected] ${row.querySelector('b')?.textContent || 'Incident'} · choose an action below.`;
-}));
-document.querySelectorAll('[data-incident-action]').forEach((button) => button.addEventListener('click', () => {
-  const active = document.querySelector('.alert-row.active');
-  const name = active?.querySelector('b')?.textContent || 'Selected incident';
-  const action = button.dataset.incidentAction;
-  const status = document.querySelector('#command-status');
-  if (status) status.textContent = `[${action}] ${name} · workflow state updated locally.`;
-  if (action === 'resolve' && active) active.classList.add('resolved');
-}));
-document.querySelectorAll('.map-zone').forEach((zone) => zone.addEventListener('click', () => {
-  const signal = zone.dataset.zone;
-  const select = document.querySelector('#copilot-symptom');
-  if (select && copilotPlans[signal]) { select.value = signal; renderCopilotPlan(); }
-  const readout = document.querySelector('#zone-readout');
-  if (readout) readout.textContent = `ZONE ${zone.textContent.split('\n')[0].trim()} · INCIDENT LOADED INTO COPILOT`;
-  document.querySelector('#ops-studio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}));
-
-const tracePacket = document.querySelector('#trace-packet');
-tracePacket?.addEventListener('click', () => {
-  const source = document.querySelector('#packet-source')?.value.split(' · ')[0] || 'Client';
-  const destination = document.querySelector('#packet-destination')?.value.split(' · ')[0] || 'Server';
-  const log = document.querySelector('#journey-log');
-  const track = document.querySelector('#journey-track');
-  if (track) { track.classList.remove('is-tracing'); requestAnimationFrame(() => track.classList.add('is-tracing')); }
-  if (log) log.textContent = `[trace] ${source} → ACCESS → DISTRIBUTION → CORE → FIREWALL → ${destination}\n[result] 6 hops · policy permitted · 3.1ms simulated RTT`;
-});
-document.querySelector('#scan-diff')?.addEventListener('click', () => {
-  const status = document.querySelector('#diff-status');
-  if (status) status.textContent = '[risk] Review trunk conversion and DHCP snooping trust before approval.';
+document.querySelector('#run-runbook')?.addEventListener('click', () => {
+  const task = document.querySelector('input[name="runbook"]:checked')?.value;
+  const messages = {
+    backup: 'DRY RUN COMPLETE · pre-check passed → synthetic config backup prepared → integrity check passed → audit note recorded.',
+    ospf: 'DRY RUN COMPLETE · sample peers checked → adjacency state compared → route summary recorded → no device contacted.',
+    vlan: 'DRY RUN COMPLETE · sample VLAN intent compared → drift report prepared → review step recorded → no change deployed.'
+  };
+  const output = document.querySelector('#runbook-output');
+  if (output) output.textContent = messages[task] || 'Choose a runbook to start the dry run.';
 });
 
-const passportCopy = {
-  airport: 'AIRPORT · Cisco, Sophos, Ruckus, NOC operations and zero-downtime support.',
-  wipro: 'WIPRO · SLA-driven application support, incident management and production troubleshooting.',
-  arivani: 'ARIVANI · Python, JavaScript, REST APIs and production web application delivery.'
-};
-document.querySelectorAll('.passport-node').forEach((node) => node.addEventListener('click', () => {
-  document.querySelectorAll('.passport-node').forEach((item) => item.classList.remove('active'));
-  node.classList.add('active');
-  const readout = document.querySelector('#passport-readout');
-  if (readout) readout.textContent = passportCopy[node.dataset.passport];
-}));
-
-const terminalResponses = {
-  'whoami': 'SOHIT VISHWAKARMA\\nNetwork & IT Infrastructure Engineer · L1/L2 · NOC Operations',
-  'about sohit': 'Airport infrastructure engineer focused on reliable networks, safe automation and clear incident response.',
-  'show achievements': '99%+ uptime · 20+ Cisco switches · 55+ Ruckus APs · 300+ CCTV cameras · 4h+ weekly automation impact',
-  'show certifications': 'Sophos Network Engineering · FortiGate Administration · Cisco Networking · Cybersecurity simulations',
-  'sudo hire sohit': 'ACCESS GRANTED ✓\\nRecommendation: schedule a technical conversation at isohitv@gmail.com'
-};
-document.querySelector('#portfolio-terminal-form')?.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const input = document.querySelector('#portfolio-terminal-input');
-  const output = document.querySelector('#portfolio-terminal-output');
-  const command = input?.value.trim().toLowerCase();
-  if (output) output.textContent = terminalResponses[command] || 'Command not found. Try: whoami, about sohit, show achievements, show certifications, sudo hire sohit';
-  if (input) input.value = '';
+document.querySelectorAll('.alert-row[data-alert]').forEach((row) => {
+  row.addEventListener('click', () => {
+    document.querySelectorAll('.alert-row[data-alert]').forEach((other) => other.classList.toggle('is-selected', other === row));
+    const status = document.querySelector('#alert-status');
+    if (status) status.textContent = `Selected sample alert: ${row.querySelector('b')?.textContent || row.dataset.alert}.`;
+  });
+});
+document.querySelectorAll('[data-alert-action]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const selected = document.querySelector('.alert-row.is-selected[data-alert]');
+    const status = document.querySelector('#alert-status');
+    if (status) status.textContent = `${button.dataset.alertAction} recorded for the selected sample alert. This is a local simulation.`;
+  });
 });
 
-const replaySteps = [
-  '[01] Alert received · NMS raised a trunk degradation signal.',
-  '[02] Engineer action · isolated the affected VLAN and checked trunk state.',
-  '[03] Root cause · native VLAN mismatch introduced packet loss.',
-  '[04] Recovery · restored the approved trunk configuration and verified paths.',
-  '[05] Prevention · added config-diff review to the automation runbook.'
-];
 let replayTimer = null;
-document.querySelector('#replay-theatre-run')?.addEventListener('click', () => {
-  const steps = document.querySelectorAll('.replay-step');
-  const readout = document.querySelector('#replay-readout');
-  let index = 0;
+document.querySelector('#replay-run')?.addEventListener('click', () => {
+  const steps = [...document.querySelectorAll('#replay-steps li')];
+  const output = document.querySelector('#replay-output');
+  if (!steps.length || !output) return;
   if (replayTimer) clearInterval(replayTimer);
-  steps.forEach((step) => step.classList.remove('active', 'complete'));
-  replayTimer = setInterval(() => {
-    steps.forEach((step, stepIndex) => step.classList.toggle('complete', stepIndex < index));
-    if (steps[index]) steps[index].classList.add('active');
-    if (readout) readout.textContent = replaySteps[index] || replaySteps[replaySteps.length - 1];
+  let index = 0;
+  const showStep = () => {
+    steps.forEach((step, stepIndex) => step.classList.toggle('is-current', stepIndex === index));
+    output.textContent = `SIMULATED REPLAY · Step ${index + 1} of ${steps.length}: ${steps[index].textContent}`;
     index += 1;
-    if (index >= replaySteps.length) { clearInterval(replayTimer); replayTimer = null; }
-  }, 700);
+    if (index >= steps.length) { clearInterval(replayTimer); replayTimer = null; }
+  };
+  showStep();
+  replayTimer = setInterval(showStep, 1050);
 });
 
-const radarData = {
-  routing: ['ROUTING & SWITCHING', 'Project: MVI Airport Network Deployment', 'Cisco Catalyst · OSPF · VLAN · STP/RSTP'],
-  security: ['SECURITY & VPN', 'Case study: Sophos Firewall HA and secure airport zones', 'Sophos · FortiGate · IPsec · NAT · IPS'],
-  automation: ['NETWORK AUTOMATION', 'Project: Repeatable network backup and compliance workflow', 'Python · Netmiko · NAPALM · Ansible · Git'],
-  cloud: ['CLOUD NETWORKING', 'Lab track: Designing secure AWS VPC foundations for hybrid growth', 'AWS VPC · EC2 · IAM · Security Groups · Route Tables'],
-  observability: ['OBSERVABILITY', 'Case study: Turning live telemetry into faster incident triage', 'Infron NMS · Zabbix · SolarWinds · Logs · Wireshark'],
-  identity: ['IDENTITY & NAC', 'Case study: Controlled access across airport users, devices and wireless zones', 'Active Directory · Group Policy · 802.1X · RADIUS · WPA2-Enterprise'],
-  noc: ['NOC OPERATIONS', 'Case study: 24/7 airport monitoring and incident response', 'Infron NMS · Zabbix · Wireshark · RCA · ITIL'],
-  iac: ['NETWORK AS CODE', 'Project: Versioned, reviewable changes for repeatable infrastructure delivery', 'Ansible · YAML · Git/GitHub · REST APIs · Rollback thinking'],
-  'airport-systems': ['AIRPORT IT SYSTEMS', 'Case study: Keeping passenger-facing and operational systems available across airport zones', 'FIDS · Access Control · PA Systems · EPABX · ISP Coordination'],
-  surveillance: ['VIDEO SURVEILLANCE', 'Case study: Supporting 300+ Honeywell CCTV endpoints and recording infrastructure', 'Honeywell CCTV · DVR · NVR · VMS · VLAN Segmentation · Storage Health'],
-  telephony: ['PA & EPABX', 'Case study: Supporting airport announcements, extensions and critical voice communication', 'Public Address · EPABX · SIP / Telephony · Extension Management · Fault Isolation'],
-  isp: ['ISP & WAN OPERATIONS', 'Case study: Managing provider handoffs and WAN availability for zero-downtime operations', 'ISP Escalation · WAN Links · CPE · Routing · Failover · SLA Tracking']
+const skillEvidence = {
+  routing: ['ROUTING & SWITCHING', 'Evidence: Cisco routing and automation lab; airport network support.', 'Cisco Catalyst · OSPF · VLAN · STP/RSTP'],
+  security: ['SECURITY & VPN', 'Evidence: Sophos HA, FortiGate administration, VPN, access controls.', 'Firewall · IPsec/SSL VPN · ACL · NAT'],
+  automation: ['NETWORK AUTOMATION', 'Evidence: EVE-NG practice and repeatable Python/Netmiko/NAPALM checks.', 'Python · Netmiko · NAPALM · Ansible'],
+  cloud: ['CLOUD NETWORKING', 'Learning direction: AWS networking and cloud-connected infrastructure fundamentals.', 'AWS VPC · EC2 · S3 · IAM fundamentals'],
+  observability: ['OBSERVABILITY', 'Evidence: Zabbix monitoring lab and NOC troubleshooting workflows.', 'Infron NMS · Zabbix · Wireshark · SolarWinds'],
+  identity: ['IDENTITY & NAC', 'Evidence: Active Directory, Group Policy, directory services, and access systems.', 'Active Directory · GPO · access control'],
+  noc: ['NOC OPERATIONS', 'Evidence: 24/7 monitoring, incident scoping, escalation, recovery, and RCA.', 'Incident response · SLA · RCA'],
+  iac: ['NETWORK AS CODE', 'Learning direction: versioned intent, reviewable changes, and repeatable configuration.', 'Git · YAML · Ansible · Python'],
+  airport: ['AIRPORT IT SYSTEMS', 'Evidence: deployment and support for connected passenger-facing infrastructure.', 'Cisco · Ruckus · Sophos · FIDS'],
+  surveillance: ['VIDEO SURVEILLANCE', 'Evidence: CCTV service support and DVR/NVR/VMS troubleshooting.', '300+ Honeywell cameras · DVR/NVR · VMS'],
+  telephony: ['PA & EPABX', 'Evidence: public-address and telephony service coordination.', 'PA · EPABX · service coordination'],
+  isp: ['ISP & WAN OPERATIONS', 'Evidence: ISP coordination and LAN/WAN incident path checks.', 'WAN · VPN · routing · escalation']
 };
-document.querySelectorAll('.radar-option').forEach((option) => option.addEventListener('click', () => {
-  document.querySelectorAll('.radar-option').forEach((item) => item.classList.remove('active'));
-  option.classList.add('active');
-  const data = radarData[option.dataset.skill];
-  const readout = document.querySelector('#radar-readout');
-  if (readout && data) readout.innerHTML = `<b>${data[0]}</b><span>${data[1]}</span><small>${data[2]}</small>`;
-}));
+document.querySelectorAll('.skill-options [data-skill]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const item = skillEvidence[button.dataset.skill];
+    if (!item) return;
+    document.querySelectorAll('.skill-options [data-skill]').forEach((other) => other.classList.toggle('is-active', other === button));
+    const readout = document.querySelector('#skill-readout');
+    if (!readout) return;
+    readout.replaceChildren(...item.map((text, index) => {
+      const part = document.createElement(index === 0 ? 'b' : index === 1 ? 'span' : 'small');
+      part.textContent = text;
+      return part;
+    }));
+  });
+});
 
-const builderCanvas = document.querySelector('#builder-canvas');
-const builderStatus = document.querySelector('#builder-status');
-let builderCount = 0;
-let builderSelected = null;
-const builderConnections = [];
-const builderLinkSvg = builderCanvas?.querySelector('.builder-links');
-const renderBuilderLinks = () => {
-  if (!builderLinkSvg || !builderCanvas) return;
-  const bounds = builderCanvas.getBoundingClientRect();
-  builderLinkSvg.setAttribute('viewBox', `0 0 ${builderCanvas.clientWidth} ${builderCanvas.clientHeight}`);
-  builderLinkSvg.innerHTML = builderConnections.map(([from, to]) => {
-    const a = from.getBoundingClientRect();
-    const b = to.getBoundingClientRect();
-    const x1 = a.left - bounds.left + a.width / 2;
-    const y1 = a.top - bounds.top + a.height / 2;
-    const x2 = b.left - bounds.left + b.width / 2;
-    const y2 = b.top - bounds.top + b.height / 2;
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
-  }).join('');
-};
-const updateBuilderStatus = () => {
-  if (builderStatus) builderStatus.textContent = `${builderCount} devices · ${builderConnections.length} links`;
-  const hint = builderCanvas?.querySelector('.canvas-hint');
-  if (hint) hint.hidden = builderCount > 0;
-  renderBuilderLinks();
-};
-const addBuilderDevice = (type, x = 20 + (builderCount % 4) * 82, y = 24 + Math.floor(builderCount / 4) * 58) => {
-  if (!builderCanvas || builderCount >= 10) return;
+const interviewRound = { index: 0, score: 0, streak: 0, answered: false, order: [] };
+const interviewQuestion = document.querySelector('#quiz-question');
+const interviewOptions = document.querySelector('#quiz-options');
+const interviewShuffle = (items) => items.map((item) => [Math.random(), item]).sort((a, b) => a[0] - b[0]).map((item) => item[1]);
+function startInterviewRound() {
+  if (!interviewQuestion || !interviewOptions || !interviewQuestionBank.length) return;
+  interviewRound.index = 0; interviewRound.score = 0; interviewRound.streak = 0; interviewRound.answered = false;
+  interviewRound.order = interviewShuffle([...Array(interviewQuestionBank.length).keys()]).slice(0, 10);
+  document.querySelector('#quiz-score').textContent = '0';
+  document.querySelector('#quiz-streak').textContent = '0';
+  document.querySelector('#quiz-status').textContent = 'READY';
+  renderInterviewQuestion();
+}
+function renderInterviewQuestion() {
+  const item = interviewQuestionBank[interviewRound.order[interviewRound.index]];
+  if (!item) return;
+  interviewRound.answered = false;
+  interviewQuestion.textContent = item[0];
+  document.querySelector('#quiz-category').textContent = item[3];
+  document.querySelector('#quiz-level').textContent = interviewRound.index % 3 === 0 ? 'SCENARIO' : 'INTERVIEW LEVEL';
+  document.querySelector('#quiz-progress').textContent = `${interviewRound.index + 1} / 10`;
+  document.querySelector('#quiz-feedback').textContent = 'Choose the best answer.';
+  interviewOptions.replaceChildren();
+  interviewShuffle(item[1].map((answer, answerIndex) => ({ answer, answerIndex }))).forEach(({ answer, answerIndex }) => {
+    const option = document.createElement('button');
+    option.className = 'quiz-option';
+    const letter = document.createElement('span');
+    letter.textContent = String.fromCharCode(65 + answerIndex);
+    option.append(letter, document.createTextNode(answer));
+    option.addEventListener('click', () => answerInterviewQuestion(option, answerIndex, item));
+    interviewOptions.append(option);
+  });
+}
+function answerInterviewQuestion(selectedButton, answerIndex, item) {
+  if (interviewRound.answered) return;
+  interviewRound.answered = true;
+  const options = [...interviewOptions.querySelectorAll('button')];
+  options.forEach((option) => { option.disabled = true; });
+  const feedback = document.querySelector('#quiz-feedback');
+  if (answerIndex === item[2]) {
+    selectedButton.classList.add('correct');
+    interviewRound.score += 10 + interviewRound.streak * 2;
+    interviewRound.streak += 1;
+    feedback.textContent = 'Correct — strong engineering instinct. Next question loading…';
+    document.querySelector('#quiz-status').textContent = 'ANSWER ACCEPTED';
+  } else {
+    selectedButton.classList.add('incorrect');
+    options.find((option) => option.textContent.slice(1) === item[1][item[2]])?.classList.add('correct');
+    interviewRound.streak = 0;
+    feedback.textContent = `Not quite. Correct answer: ${item[1][item[2]]}`;
+    document.querySelector('#quiz-status').textContent = 'REVIEW REQUIRED';
+  }
+  document.querySelector('#quiz-score').textContent = String(interviewRound.score);
+  document.querySelector('#quiz-streak').textContent = String(interviewRound.streak);
+  window.setTimeout(() => {
+    interviewRound.index += 1;
+    if (interviewRound.index >= 10) {
+      interviewQuestion.textContent = `Session complete — ${interviewRound.score} points`;
+      document.querySelector('#quiz-category').textContent = 'RESULTS';
+      document.querySelector('#quiz-level').textContent = '10 RANDOM QUESTIONS';
+      document.querySelector('#quiz-progress').textContent = '10 / 10';
+      document.querySelector('#quiz-status').textContent = 'SESSION COMPLETE';
+      document.querySelector('#quiz-feedback').textContent = 'Start a new session whenever you are ready.';
+      interviewOptions.replaceChildren();
+    } else renderInterviewQuestion();
+  }, 950);
+}
+document.querySelector('#quiz-reset')?.addEventListener('click', startInterviewRound);
+startInterviewRound();
+
+const topologyCanvas = document.querySelector('#builder-canvas');
+let selectedLabNode = null;
+let labLinks = 0;
+function refreshTopologyStatus() {
+  const deviceCount = topologyCanvas?.querySelectorAll('.builder-node').length || 0;
+  const status = document.querySelector('#builder-status');
+  if (status) status.textContent = `${deviceCount} devices · ${labLinks} links`;
+}
+function addTopologyDevice(name) {
+  if (!topologyCanvas) return;
+  topologyCanvas.querySelector('.canvas-hint')?.remove();
   const device = document.createElement('button');
   device.type = 'button';
-  device.className = 'canvas-device';
-  device.dataset.device = type;
-  device.style.left = `${Math.min(x, builderCanvas.clientWidth - 84)}px`;
-  device.style.top = `${Math.min(y, builderCanvas.clientHeight - 48)}px`;
-  device.innerHTML = `${type.toUpperCase()}<small>SIMULATED</small>`;
+  device.className = 'builder-node';
+  device.textContent = name;
+  device.setAttribute('aria-label', `Select ${name} in simulated topology`);
   device.addEventListener('click', () => {
-    if (!builderSelected) { builderSelected = device; device.classList.add('selected'); return; }
-    if (builderSelected === device) { device.classList.remove('selected'); builderSelected = null; return; }
-    const duplicate = builderConnections.some(([from, to]) => (from === builderSelected && to === device) || (from === device && to === builderSelected));
-    if (duplicate) { builderSelected.classList.remove('selected'); builderSelected = null; return; }
-    builderConnections.push([builderSelected, device]);
-    builderSelected.classList.remove('selected');
-    builderSelected = null;
-    updateBuilderStatus();
+    if (!selectedLabNode || selectedLabNode === device || !selectedLabNode.isConnected) {
+      topologyCanvas.querySelectorAll('.builder-node').forEach((node) => node.classList.remove('is-selected'));
+      selectedLabNode = device;
+      device.classList.add('is-selected');
+      return;
+    }
+    const link = document.createElement('span');
+    link.className = 'builder-connection';
+    link.textContent = `${selectedLabNode.textContent} ↔ ${device.textContent}`;
+    topologyCanvas.querySelector('.builder-connections')?.append(link);
+    selectedLabNode.classList.remove('is-selected');
+    selectedLabNode = null;
+    labLinks += 1;
+    refreshTopologyStatus();
   });
-  builderCanvas.appendChild(device);
-  builderCount += 1;
-  updateBuilderStatus();
-};
-document.querySelectorAll('#builder-tools button').forEach((tool) => {
-  tool.addEventListener('dragstart', (event) => event.dataTransfer?.setData('text/plain', tool.dataset.device));
-  tool.addEventListener('click', () => addBuilderDevice(tool.dataset.device));
+  topologyCanvas.insertBefore(device, topologyCanvas.querySelector('.builder-connections') || null);
+  if (!topologyCanvas.querySelector('.builder-connections')) {
+    const links = document.createElement('div');
+    links.className = 'builder-connections';
+    topologyCanvas.append(links);
+  }
+  refreshTopologyStatus();
+}
+document.querySelectorAll('.builder-tools [data-device]').forEach((button) => {
+  button.addEventListener('click', () => addTopologyDevice(button.dataset.device));
+  button.addEventListener('dragstart', (event) => event.dataTransfer?.setData('text/plain', button.dataset.device));
 });
-builderCanvas?.addEventListener('dragover', (event) => { event.preventDefault(); builderCanvas.classList.add('is-over'); });
-builderCanvas?.addEventListener('dragleave', () => builderCanvas.classList.remove('is-over'));
-builderCanvas?.addEventListener('drop', (event) => {
+topologyCanvas?.addEventListener('dragover', (event) => event.preventDefault());
+topologyCanvas?.addEventListener('drop', (event) => {
   event.preventDefault();
-  builderCanvas.classList.remove('is-over');
-  const rect = builderCanvas.getBoundingClientRect();
-  addBuilderDevice(event.dataTransfer?.getData('text/plain') || 'switch', event.clientX - rect.left - 40, event.clientY - rect.top - 20);
+  const name = event.dataTransfer?.getData('text/plain');
+  if (['Router', 'Switch', 'Firewall', 'Server'].includes(name)) addTopologyDevice(name);
 });
 document.querySelector('#builder-reset')?.addEventListener('click', () => {
-  builderCanvas?.querySelectorAll('.canvas-device').forEach((device) => device.remove());
-  builderCount = 0; builderConnections.length = 0; builderSelected = null; updateBuilderStatus();
+  if (!topologyCanvas) return;
+  topologyCanvas.replaceChildren(Object.assign(document.createElement('span'), { className: 'canvas-hint', textContent: 'DROP OR ADD DEVICE HERE' }));
+  selectedLabNode = null; labLinks = 0; refreshTopologyStatus();
 });
-window.addEventListener('resize', renderBuilderLinks);
-
-const runbookLogs = {
-  backup: ['[precheck] 20 devices reachable via SSH', '[execute] collecting running-config from Catalyst estate', '[verify] checksums match and archive committed to Git', '[result] 20/20 backups complete · ROLLBACK READY'],
-  ospf: ['[precheck] 12 OSPF neighbors discovered', '[execute] collecting adjacency, route and interface state', '[verify] all expected routes present · no flaps detected', '[result] topology health PASS · evidence exported'],
-  vlan: ['[precheck] loading intended VLAN state from YAML', '[execute] comparing access and trunk ports', '[verify] 2 drift items detected and safely flagged', '[result] audit complete · change approval required']
-};
-const runbookTimeSaved = { backup: 'EST. TIME SAVED 4h+', ospf: 'EST. TIME SAVED 90m', vlan: 'EST. TIME SAVED 2h' };
-let selectedRunbook = 'backup';
-let runbookTimer = null;
-const runbookProgress = (step, total, running = true) => {
-  const bar = document.querySelector('#runbook-progress-bar');
-  const label = document.querySelector('#runbook-progress-label');
-  const button = document.querySelector('#run-runbook');
-  if (bar) bar.style.width = `${Math.round((step / total) * 100)}%`;
-  if (label) label.textContent = running ? `RUNNING · ${step}/${total}` : `COMPLETE · ${step}/${total}`;
-  if (button) button.disabled = running;
-};
-document.querySelectorAll('.runbook-choice').forEach((choice) => choice.addEventListener('click', () => {
-  if (runbookTimer) clearInterval(runbookTimer);
-  document.querySelectorAll('.runbook-choice').forEach((item) => item.classList.remove('active'));
-  choice.classList.add('active');
-  selectedRunbook = choice.dataset.runbook;
-  const saved = document.querySelector('#runbook-time-saved');
-  if (saved) saved.textContent = runbookTimeSaved[selectedRunbook];
-  runbookProgress(0, 4, false);
-}));
-document.querySelector('#run-runbook')?.addEventListener('click', () => {
-  const log = document.querySelector('#runbook-log');
-  const steps = runbookLogs[selectedRunbook];
-  let index = 0;
-  if (!log) return;
-  if (runbookTimer) clearInterval(runbookTimer);
-  log.textContent = '[start] dry run initialized...\n';
-  runbookProgress(0, steps.length, true);
-  runbookTimer = setInterval(() => {
-    log.textContent += `${steps[index++]}\n`;
-    runbookProgress(index, steps.length, index < steps.length);
-    if (index >= steps.length) { clearInterval(runbookTimer); runbookTimer = null; }
-  }, 550);
+document.querySelector('#diff-review')?.addEventListener('click', () => {
+  const result = document.querySelector('#diff-output');
+  if (result) result.textContent = 'SAMPLE REVIEW · confirm that VLAN 10/20 are intended; verify DHCP snooping trust is only on a trusted uplink; compare against approved change scope before applying.';
 });
-document.querySelector('#runbook-time-saved').textContent = runbookTimeSaved.backup;
 
-const WEB3FORMS_ACCESS_KEY = '0cf72841-5646-4255-8636-320e160e44b8';
-
-document.querySelector('#contact-form')?.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const name = form.querySelector('[name="name"]').value.trim();
-  const email = form.querySelector('[name="email"]').value.trim();
-  const message = form.querySelector('[name="message"]').value.trim();
-  const status = document.querySelector('#form-status');
-  const submitButton = form.querySelector('button[type="submit"]');
-  if (WEB3FORMS_ACCESS_KEY === 'PASTE_WEB3FORMS_ACCESS_KEY_HERE') {
-    if (status) status.textContent = 'Contact form setup is incomplete. Add the Web3Forms access key.';
-    return;
-  }
-  const payload = new FormData(form);
-  payload.append('access_key', WEB3FORMS_ACCESS_KEY);
-  payload.append('subject', `Portfolio enquiry from ${name}`);
-  payload.append('from_name', 'Sohit Portfolio');
-  if (submitButton) submitButton.disabled = true;
-  if (status) status.textContent = 'Sending securely…';
-  try {
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      body: payload,
-      headers: { Accept: 'application/json' }
-    });
-    const result = await response.json();
-    if (!response.ok || !result.success) throw new Error(result.message || 'Message delivery failed.');
-    form.reset();
-    if (status) status.textContent = 'Message sent successfully. Thank you for reaching out.';
-  } catch (error) {
-    if (status) status.textContent = 'Message could not be sent. Please try again.';
-    console.error('Contact form submission failed:', error);
-  } finally {
-    if (submitButton) submitButton.disabled = false;
-  }
+document.querySelectorAll('.zone-buttons [data-zone]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const prompts = {
+      terminal: 'Sample area · FIDS/display service: check endpoint status, DNS, application response, and service freshness.',
+      security: 'Sample area · wireless access: check client authentication, AP state, VLAN mapping, and radius reachability.',
+      server: 'Sample area · core/server services: review interface state, route path, directory service, and host health.',
+      cctv: 'Sample area · CCTV/VMS: check PoE and link, VLAN reachability, camera registration, and monitoring alerts.'
+    };
+    const readout = document.querySelector('#zone-readout');
+    if (readout) readout.textContent = prompts[button.dataset.zone] || 'Select a sample service area.';
+    document.querySelectorAll('.zone-buttons [data-zone]').forEach((item) => item.classList.toggle('is-active', item === button));
+  });
 });

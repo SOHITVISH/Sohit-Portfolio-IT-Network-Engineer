@@ -1,119 +1,29 @@
-# Sohit Vishwakarma — Network & IT Infrastructure Engineer
+# Sohit Vishwakarma — Network & Infrastructure Portfolio
 
-> Professional portfolio for Sohit Vishwakarma, a Network & IT Infrastructure Engineer focused on reliable, secure and observable systems.
+A standalone, responsive portfolio site for network and IT infrastructure roles. It uses plain HTML, CSS, and JavaScript so it can be hosted on GitHub Pages without a build step.
 
-## About
+The interface follows an editorial warm-black-and-ivory visual system with oversized serif type, copper details, long-form career and field-work sections, airport operating zones, automation workflows, a modern networking growth path, and the full learning record. Interactive features include skill-to-evidence mapping, a randomized network interview quiz, simulated CLI and packet journey, incident triage, alert review, a local topology builder, runbook dry runs, configuration-diff review, and incident replay. Scroll-triggered reveals, an operational-principles ticker, and a motion pause/resume control respect reduced-motion preferences.
 
-I am a Network and IT Infrastructure Engineer with 2.5+ years of IT experience across mission-critical airport operations, NOC support, application support and software development.
+## Preview locally
 
-My current work supports Maharishi Valmiki International Airport, Ayodhya Dham, where I control, monitor and troubleshoot the connected technology environment:
-
-- 20+ Cisco Catalyst L2/L3 switches
-- 55+ Ruckus wireless access points
-- Sophos Active/Standby Firewall HA
-- 300+ Honeywell CCTV cameras
-- DVR / NVR / VMS surveillance operations
-- FIDS, access control and public address systems
-- PA systems, EPABX / telephony and ISP coordination
-- Linux and Windows Server infrastructure
-- Active Directory and PowerShell administration
-- 24/7 NOC monitoring, incident response and RCA
-
-## Portfolio Features
-
-- Dark network-operations interface
-- Responsive desktop and mobile layout
-- Airport infrastructure operations map
-- Expertise cards with engineering capabilities
-- Project filtering by infrastructure, automation and observability
-- Interactive network console
-- Sanitized airport topology case study
-- Certification and education section
-- Mailto contact CTA addressed to `isohitv@gmail.com`
-- “Route the Packet” network-engineering mini game
-- Scroll progress and reveal animations
-- Reduced-motion accessibility support
-
-## Technical Expertise
-
-### Networking
-
-Cisco IOS, VLANs, 802.1Q trunking, STP/RSTP, port security, MAC tables, OSPF, BGP fundamentals, static/default routing, inter-VLAN routing, DNS, DHCP, LAN/WAN and IP subnetting.
-
-### Security
-
-Sophos Firewall HA, FortiGate administration, IPsec VPN, SSL VPN, site-to-site VPN, IDS/IPS, ACL, NAT, security monitoring and threat-log analysis.
-
-### Systems
-
-Linux (Ubuntu/CentOS), Windows Server, SSH, Bash, PowerShell, Active Directory, Group Policy, OU management, system hardening and scheduled automation.
-
-### Monitoring & Troubleshooting
-
-Infron NMS, Zabbix, SolarWinds, Wireshark, Nmap, ping, traceroute, netstat, packet analysis, incident management, escalation and root cause analysis.
-
-### Automation & Cloud
-
-Python, Netmiko, NAPALM, Paramiko, REST APIs, Ansible, Git/GitHub, JSON/YAML, AWS VPC, EC2, S3 and IAM fundamentals.
-
-## Featured Work
-
-### MVI Airport IT & Network Infrastructure
-
-End-to-end airport IT and network deployment, including structured cabling, Cisco switch configuration, Ruckus AP deployment, Sophos Firewall HA, NMS integration, Active Directory, CCTV commissioning, FIDS go-live, access control and public address systems.
-
-### Cisco Routing & Automation Lab
-
-EVE-NG lab with Cisco routers, OSPF, VLANs, STP and pfSense. Python and Netmiko scripts automate configuration backups, OSPF neighbor verification and interface reporting.
-
-### Network Monitoring Lab
-
-Zabbix deployment for SNMP-based device monitoring with dashboards and alerts for CPU, memory and interface utilization.
-
-## Run Locally
-
-The portfolio is powered by React and Vite, with the existing custom cyber-operations CSS system preserved during the staged component migration.
+Open `index.html` in a browser, or run a local static server from this directory:
 
 ```bash
-git clone https://github.com/SOHITVISH/Sohit-Portfolio-IT-Network-Engineer.git
-cd Sohit-Portfolio-IT-Network-Engineer
-npm install
-npm run dev
+python -m http.server 8000
 ```
 
-Open the Vite URL shown in the terminal. To create a production bundle:
+Then visit `http://localhost:8000`.
 
-```bash
-npm run build
-```
+## Publish with GitHub Pages
 
-## Project Structure
+Push the contents of this directory to a new repository and enable GitHub Pages for the `main` branch and root folder. The contact links intentionally expose only email, LinkedIn, and GitHub. No phone number or resume PDF is included.
 
-```text
-.
-├── index.html   # Vite entry point
-├── src/         # React application shell and migration components
-├── legacy.html  # Preserved source document during staged migration
-├── public/        # Runtime content, profile assets and legacy interactions
-├── style.css    # Dark visual system and responsive layout
-├── script.js    # Interactions, filters, console and mini game
-├── vite.config.js
-├── package.json
-└── README.md    # Project documentation
-```
+## Accuracy and privacy notes
 
-## Contact
-
-- Email: [isohitv@gmail.com](mailto:isohitv@gmail.com)
-- LinkedIn: [linkedin.com/in/sohit-vishwakarma](https://linkedin.com/in/sohit-vishwakarma)
-- GitHub: [github.com/SOHITVISH](https://github.com/SOHITVISH)
-- Location: Lucknow, India
-- Open to relocation across India
-
-## Privacy Note
-
-The portfolio intentionally uses sanitized infrastructure information. Never add live IP addresses, credentials, firewall rules, airport security details or other confidential operational data.
-
-## License
-
-This portfolio content and visual design belong to Sohit Vishwakarma. Contact the author before reusing personal content, branding or project descriptions.
+- The hero network diagram is an illustration. It contains no live telemetry or production addresses.
+- The CLI, packet trace, dashboard, alert feed, topology events, service-area prompts, and incident replay use synthetic examples only; they never connect to a device or service.
+- The signature-classification project is described as an experimental baseline, not forensic proof.
+- The 4+ hours per week figure is associated with the EVE-NG automation lab.
+- The React 360° virtual tour is described as a professional contribution, not a solo project; no public source link is claimed.
+- Additional courses and platform assessments are listed separately from formal certifications.
+- Airport infrastructure details are kept at a high level; do not add live topology, credentials, or sensitive operational information.
