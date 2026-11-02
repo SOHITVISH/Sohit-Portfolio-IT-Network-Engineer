@@ -228,6 +228,14 @@ body,.work,.experience,.toolkit{background-color:var(--bg)}
 .motion-ready .reveal.is-visible{filter:blur(0)}
 .motion-ready .project-card:nth-child(3n+2){transition-delay:90ms}.motion-ready .project-card:nth-child(3n){transition-delay:160ms}
 .motion-ready .section-kicker.reveal,.motion-ready .section-heading-row.reveal{transition-delay:0ms}
+.main-nav a[aria-current="location"]{color:var(--ink);text-shadow:0 0 16px rgba(220,154,103,.28)}
+.main-nav a[aria-current="location"]:not(.nav-contact)::after{content:"";display:block;height:1px;margin-top:5px;background:var(--mint);transform-origin:left;animation:nav-underline .35s ease both}
+@keyframes nav-underline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.project-card,.toolkit-card,.studio-card,.zone-grid article,.field-note-grid article{transition:border-color .35s,box-shadow .35s,background .35s}
+.project-card:hover,.toolkit-card:hover,.studio-card:hover,.zone-grid article:hover,.field-note-grid article:hover{background:radial-gradient(260px circle at var(--spot-x,50%) var(--spot-y,50%),rgba(220,154,103,.09),transparent 72%),linear-gradient(145deg,#100d0b,#090807)}
+.network-visual{transform:translate3d(var(--parallax-x,0),var(--parallax-y,0),0)}
+.network-visual:after{background:radial-gradient(circle at var(--spot-x,50%) var(--spot-y,50%),rgba(220,154,103,.16),transparent 55%)}
+@media(prefers-reduced-motion:reduce){.main-nav a[aria-current="location"]::after{animation:none}}
 .airport-grid{background-size:30px 30px;animation:grid-drift 26s linear infinite}
 @keyframes grid-drift{to{background-position:30px 30px}}
 @media(max-width:680px){.project-feature{grid-column:auto;grid-row:auto;grid-template-columns:minmax(0,1fr);gap:0;min-height:0}.project-feature .project-art{grid-column:auto;grid-row:auto;height:190px;min-height:0;margin-bottom:16px}.project-feature .project-meta,.project-feature h3,.project-feature>p,.project-feature .tag-row,.project-feature .project-footnote{grid-column:auto;grid-row:auto}.project-feature h3{margin:15px 0 8px}.project-feature .tag-row{align-self:auto}.toolkit{background:var(--bg)}.toolkit-grid{gap:10px}}

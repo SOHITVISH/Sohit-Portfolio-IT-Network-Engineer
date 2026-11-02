@@ -28,7 +28,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir dist
-          cp index.html styles.css script.js favicon.svg dist/
+          cp index.html styles.css script.js favicon.svg Sohit_Vishwakarma_Resume.pdf dist/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

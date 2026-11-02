@@ -2,7 +2,7 @@
 
 A standalone, responsive portfolio site for network and IT infrastructure roles. It uses plain HTML, CSS, and JavaScript so it can be hosted on GitHub Pages without a build step.
 
-The interface follows an editorial warm-black-and-ivory visual system with oversized serif type, copper details, long-form career and field-work sections, airport operating zones, automation workflows, a modern networking growth path, and the full learning record. Interactive features include skill-to-evidence mapping, a randomized network interview quiz, simulated CLI and packet journey, incident triage, alert review, a local topology builder, runbook dry runs, configuration-diff review, and incident replay. Scroll-triggered reveals, an operational-principles ticker, and a motion pause/resume control respect reduced-motion preferences.
+The interface follows an editorial warm-black-and-ivory visual system with oversized serif type, copper details, long-form career and field-work sections, airport operating zones, automation workflows, a modern networking growth path, and the full learning record. Interactive features include skill-to-evidence mapping, a randomized network interview quiz, simulated CLI and packet journey, incident triage, alert review, a local topology builder, runbook dry runs, configuration-diff review, and incident replay. Scroll-triggered reveals, pointer-responsive highlights, an operational-principles ticker, and a motion pause/resume control respect reduced-motion preferences.
 
 ## Preview locally
 
@@ -16,7 +16,7 @@ Then visit `http://localhost:8000`.
 
 ## Publish with GitHub Pages
 
-Push the contents of this directory to a new repository and enable GitHub Pages for the `main` branch and root folder. The contact links intentionally expose only email, LinkedIn, and GitHub. No phone number or resume PDF is included.
+The public contact links intentionally expose only email, LinkedIn, and GitHub. A downloadable resume PDF is available from the hero and contact sections.
 
 ## Accuracy and privacy notes
 

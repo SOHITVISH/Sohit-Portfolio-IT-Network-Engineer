@@ -75,6 +75,59 @@ if ('IntersectionObserver' in window) {
   revealTargets.forEach((element) => element.classList.add('is-visible'));
 }
 
+const sectionLinks = [...document.querySelectorAll('.main-nav a[href^="#"]')];
+const linkedSections = sectionLinks
+  .map((link) => ({ link, section: document.querySelector(link.getAttribute('href')) }))
+  .filter((item) => item.section);
+
+if ('IntersectionObserver' in window && linkedSections.length) {
+  const navObserver = new IntersectionObserver((entries) => {
+    const current = entries.filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!current) return;
+    linkedSections.forEach(({ link, section }) => {
+      if (section === current.target) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }, { rootMargin: '-22% 0px -62% 0px', threshold: [0, .15, .4, .7] });
+  linkedSections.forEach(({ section }) => navObserver.observe(section));
+}
+
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+if (finePointer.matches) {
+  document.querySelectorAll('.project-card, .toolkit-card, .studio-card, .zone-grid article, .field-note-grid article').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      if (!motionEnabled) return;
+      const bounds = card.getBoundingClientRect();
+      card.style.setProperty('--spot-x', `${event.clientX - bounds.left}px`);
+      card.style.setProperty('--spot-y', `${event.clientY - bounds.top}px`);
+    }, { passive: true });
+    card.addEventListener('pointerleave', () => {
+      card.style.removeProperty('--spot-x');
+      card.style.removeProperty('--spot-y');
+    });
+  });
+
+  const hero = document.querySelector('.hero');
+  const networkVisual = document.querySelector('.network-visual');
+  hero?.addEventListener('pointermove', (event) => {
+    if (!motionEnabled || !networkVisual) return;
+    const bounds = hero.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - .5;
+    const y = (event.clientY - bounds.top) / bounds.height - .5;
+    networkVisual.style.setProperty('--parallax-x', `${(x * 7).toFixed(1)}px`);
+    networkVisual.style.setProperty('--parallax-y', `${(y * 7).toFixed(1)}px`);
+    networkVisual.style.setProperty('--spot-x', `${((x + .5) * 100).toFixed(1)}%`);
+    networkVisual.style.setProperty('--spot-y', `${((y + .5) * 100).toFixed(1)}%`);
+  }, { passive: true });
+  hero?.addEventListener('pointerleave', () => {
+    networkVisual?.style.removeProperty('--parallax-x');
+    networkVisual?.style.removeProperty('--parallax-y');
+    networkVisual?.style.removeProperty('--spot-x');
+    networkVisual?.style.removeProperty('--spot-y');
+  });
+}
+
 const disciplineInfo = {
   operate: {
     index: '01 / 03 · OPERATIONS',
