@@ -160,8 +160,9 @@ function openProjectPreview(card, trigger) {
   addProjectDetail('tags', card.querySelector('.tag-row'), 'project-dialog-tags');
   const caseStudy = card.querySelector('.project-details');
   if (caseStudy) {
-    caseStudy.open = true;
     addProjectDetail('case-study', caseStudy, 'project-dialog-case-study');
+    const previewCaseStudy = projectDialogContent.querySelector('.project-dialog-case-study');
+    if (previewCaseStudy) previewCaseStudy.open = true;
   }
   card.querySelectorAll('a.project-link').forEach((link) => addProjectDetail('link', link, 'project-dialog-link'));
   card.querySelectorAll('.project-footnote').forEach((note) => addProjectDetail('note', note, 'project-dialog-note'));
