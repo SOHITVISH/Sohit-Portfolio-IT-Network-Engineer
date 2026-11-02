@@ -13,8 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=6">
-  <script src="script.js?v=6" defer></script>
+  <link rel="stylesheet" href="styles.css?v=7">
+  <script src="script.js?v=7" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -36,6 +36,7 @@
       <a href="#ops-studio">Studio</a>
       <a href="#experience">Story</a>
       <a href="#toolkit">Skills</a>
+      <button class="terminal-nav-trigger" type="button" data-terminal-open aria-keyshortcuts="~ `">Terminal <kbd>~</kbd></button>
       <a class="nav-contact" href="#contact">Let’s talk <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
@@ -372,5 +373,21 @@ All values shown are synthetic lab examples.</pre>
     </section>
   </main>
   <footer class="site-footer"><a class="brand" href="#top"><span>Sohit Vishwakarma</span></a><span>LUCKNOW, INDIA · OPEN TO RELOCATION</span><span>© <span id="year">2026</span> BUILT FOR RELIABILITY</span></footer>
+  <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
+    <div class="project-dialog-shell">
+      <div class="dialog-topline"><span>SELECTED WORK / PROJECT FILE</span><button class="dialog-close" type="button" data-dialog-close aria-label="Close project preview">×</button></div>
+      <div class="project-dialog-content" id="project-dialog-content"></div>
+    </div>
+  </dialog>
+  <dialog class="terminal-dialog" id="terminal-dialog" aria-labelledby="terminal-title">
+    <section class="terminal-window">
+      <div class="terminal-topline"><div class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></div><span>SOHIT://PORTFOLIO</span><button class="dialog-close" type="button" data-dialog-close aria-label="Close terminal">×</button></div>
+      <div class="terminal-intro"><span class="micro-label">READ-ONLY PORTFOLIO TERMINAL</span><h2 id="terminal-title">A little more <em>under the hood.</em></h2><p>Type a command below. It only explores this portfolio and its sample labs.</p></div>
+      <pre class="terminal-output" id="terminal-output" aria-live="polite">Welcome, Sohit.
+Type <b>help</b> to see available commands.</pre>
+      <form class="terminal-input" id="terminal-form"><label for="terminal-command">sohit@portfolio:~$</label><input id="terminal-command" name="command" type="text" autocomplete="off" spellcheck="false" aria-label="Terminal command" placeholder="help"><button type="submit">Run <span aria-hidden="true">↵</span></button></form>
+      <div class="terminal-shortcuts"><button type="button" data-terminal-command="projects">projects</button><button type="button" data-terminal-command="skills">skills</button><button type="button" data-terminal-command="contact">contact</button><span>Press <kbd>Esc</kbd> to close</span></div>
+    </section>
+  </dialog>
 </body>
 </html>

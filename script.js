@@ -128,6 +128,156 @@ if (finePointer.matches) {
   });
 }
 
+const projectDialog = document.querySelector('#project-dialog');
+const projectDialogContent = document.querySelector('#project-dialog-content');
+let lastProjectTrigger = null;
+
+function addProjectDetail(tag, source, className) {
+  if (!source || !projectDialogContent) return;
+  const copy = source.cloneNode(true);
+  copy.classList.add(className);
+  copy.removeAttribute('id');
+  copy.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+  copy.querySelectorAll('a').forEach((link) => {
+    link.target = '_blank';
+    link.rel = 'noreferrer';
+  });
+  projectDialogContent.append(copy);
+}
+
+function openProjectPreview(card, trigger) {
+  if (!projectDialog || !projectDialogContent) return;
+  lastProjectTrigger = trigger;
+  projectDialogContent.replaceChildren();
+  const heading = document.createElement('h2');
+  heading.id = 'project-dialog-title';
+  heading.textContent = card.querySelector('h3')?.textContent.trim() || 'Project preview';
+  projectDialogContent.append(heading);
+  addProjectDetail('art', card.querySelector('.project-art'), 'project-dialog-art');
+  addProjectDetail('meta', card.querySelector('.project-meta'), 'project-dialog-meta');
+  addProjectDetail('description', card.querySelector(':scope > p:not(.project-footnote)'), 'project-dialog-description');
+  addProjectDetail('highlights', card.querySelector('.project-highlights'), 'project-dialog-highlights');
+  addProjectDetail('tags', card.querySelector('.tag-row'), 'project-dialog-tags');
+  const caseStudy = card.querySelector('.project-details');
+  if (caseStudy) {
+    caseStudy.open = true;
+    addProjectDetail('case-study', caseStudy, 'project-dialog-case-study');
+  }
+  card.querySelectorAll('a.project-link').forEach((link) => addProjectDetail('link', link, 'project-dialog-link'));
+  card.querySelectorAll('.project-footnote').forEach((note) => addProjectDetail('note', note, 'project-dialog-note'));
+  projectDialog.showModal();
+}
+
+document.querySelectorAll('.project-card').forEach((card, index) => {
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'project-preview-trigger';
+  trigger.innerHTML = `Explore project <span aria-hidden="true">↗</span>`;
+  trigger.setAttribute('aria-label', `Open project preview: ${card.querySelector('h3')?.textContent.trim() || `project ${index + 1}`}`);
+  trigger.addEventListener('click', () => openProjectPreview(card, trigger));
+  card.append(trigger);
+});
+
+projectDialog?.querySelectorAll('[data-dialog-close]').forEach((button) => {
+  button.addEventListener('click', () => projectDialog.close());
+});
+projectDialog?.addEventListener('click', (event) => {
+  if (event.target === projectDialog) projectDialog.close();
+});
+projectDialog?.addEventListener('close', () => lastProjectTrigger?.focus());
+
+const terminalDialog = document.querySelector('#terminal-dialog');
+const terminalInput = document.querySelector('#terminal-command');
+const terminalOutput = document.querySelector('#terminal-output');
+let lastTerminalTrigger = null;
+
+function openTerminal(trigger) {
+  if (!terminalDialog) return;
+  lastTerminalTrigger = trigger || document.querySelector('[data-terminal-open]');
+  terminalDialog.showModal();
+  requestAnimationFrame(() => terminalInput?.focus());
+}
+
+document.querySelectorAll('[data-terminal-open]').forEach((trigger) => {
+  trigger.addEventListener('click', () => {
+    menuToggle?.setAttribute('aria-expanded', 'false');
+    menuToggle?.setAttribute('aria-label', 'Open navigation');
+    mainNav?.classList.remove('is-open');
+    openTerminal(trigger);
+  });
+});
+
+terminalDialog?.querySelectorAll('[data-dialog-close]').forEach((button) => {
+  button.addEventListener('click', () => terminalDialog.close());
+});
+terminalDialog?.addEventListener('close', () => lastTerminalTrigger?.focus());
+terminalDialog?.querySelectorAll('[data-terminal-command]').forEach((button) => {
+  button.addEventListener('click', () => {
+    if (terminalInput) terminalInput.value = button.dataset.terminalCommand || '';
+    terminalInput?.focus();
+  });
+});
+
+const terminalCommands = {
+  help: 'Available commands:\n  about                  who is Sohit?\n  projects               list selected work\n  project 1–6            open a project preview\n  skills                 show core capabilities\n  open projects/contact  jump to a section\n  resume                 open the PDF in a new tab\n  contact                show public contact details\n  clear · exit',
+  about: 'Sohit Vishwakarma · Network & IT Infrastructure Engineer\nAirport operations, routing and switching, security, monitoring, and practical automation.\nBased in Lucknow, India · Open to relocation.',
+  whoami: 'Sohit Vishwakarma · Network & IT Infrastructure Engineer\nLucknow, India · Open to relocation across India.',
+  projects: 'SELECTED WORK\n01  Airport IT & Network Infrastructure\n02  PacketPath Networking Study Lab\n03  Fake Signature Detection\n04  React 360° Virtual Tour\n05  Cisco Routing & Automation Lab\n06  Network Monitoring Lab\nTip: type project 1 to open a detail preview.',
+  skills: 'ROUTING & SWITCHING · VLAN · OSPF · STP/RSTP\nFIREWALLS & VPN · SOPHOS HA · FORTIGATE\nMONITORING · WIRESHARK · ZABBIX · SOLARWINDS\nAUTOMATION · PYTHON · NETMIKO · NAPALM',
+  contact: 'EMAIL     isohitv@gmail.com\nLINKEDIN  linkedin.com/in/sohit-vishwakarma\nGITHUB    github.com/SOHITVISH',
+  resume: 'Opening the résumé PDF in a new tab…',
+  clear: '',
+  exit: 'Closing terminal…'
+};
+
+function runPortfolioCommand(rawCommand) {
+  if (!terminalOutput) return;
+  const command = rawCommand.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!command) return;
+  const projectMatch = command.match(/^(?:open )?project(?: | #)([1-6])$/);
+  const sectionMatch = command.match(/^open (projects|work|contact|skills|story)$/);
+  let response = terminalCommands[command];
+  if (projectMatch) {
+    const projectIndex = Number(projectMatch[1]) - 1;
+    terminalDialog?.close();
+    requestAnimationFrame(() => document.querySelectorAll('.project-preview-trigger')[projectIndex]?.click());
+    response = `Opening project ${projectMatch[1]}…`;
+  } else if (sectionMatch) {
+    const targets = { projects: '#work', work: '#work', contact: '#contact', skills: '#toolkit', story: '#experience' };
+    const target = document.querySelector(targets[sectionMatch[1]]);
+    terminalDialog?.close();
+    target?.scrollIntoView({ behavior: motionEnabled ? 'smooth' : 'auto' });
+    response = `Jumping to ${sectionMatch[1]}…`;
+  } else if (command === 'resume') {
+    window.open('Sohit_Vishwakarma_Resume.pdf', '_blank', 'noopener,noreferrer');
+  } else if (command === 'exit') {
+    terminalDialog?.close();
+  } else if (response === undefined) {
+    response = `Command not found: ${command}\nType help to see what this terminal can do.`;
+  }
+  if (command === 'clear') {
+    terminalOutput.textContent = 'Terminal cleared. Type help for commands.';
+  } else {
+    terminalOutput.textContent = `sohit@portfolio:~$ ${command}\n${response || ''}\n\n`;
+  }
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  if (terminalInput) terminalInput.value = '';
+}
+
+document.querySelector('#terminal-form')?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  runPortfolioCommand(terminalInput?.value || '');
+});
+
+document.addEventListener('keydown', (event) => {
+  const active = document.activeElement;
+  const isTyping = active instanceof HTMLElement && (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+  if (!isTyping && !event.ctrlKey && !event.metaKey && !event.altKey && event.code === 'Backquote' && !terminalDialog?.open && !projectDialog?.open) {
+    event.preventDefault();
+    openTerminal(document.querySelector('[data-terminal-open]'));
+  }
+});
+
 const disciplineInfo = {
   operate: {
     index: '01 / 03 · OPERATIONS',
