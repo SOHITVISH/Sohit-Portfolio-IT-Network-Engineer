@@ -340,6 +340,14 @@ kbd{padding:2px 5px;border:1px solid rgba(220,154,103,.3);border-radius:3px;colo
 .studio-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
 .studio-card{display:flex;flex-direction:column;min-height:300px}
 .studio-card>p{margin:12px 0}
+.ticket-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;padding:12px;border:1px solid rgba(220,154,103,.28);background:rgba(220,154,103,.045);font:8px var(--mono);letter-spacing:.06em}
+.ticket-summary>span{color:#c6b7a6}.ticket-summary>b{color:var(--mint);text-align:right}
+.ticket-impact{color:#d8caba!important;font-size:10px!important}
+.ticket-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;color:#9c8d7c;font:7px/1.6 var(--mono);letter-spacing:.08em}
+.ticket-fields span{padding:9px;border:1px solid var(--line)}.ticket-fields b{display:block;margin-top:4px;color:#d4c3ae;font-weight:400}
+.ticket-actions{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}
+.ticket-actions button{padding:7px 8px;border:1px solid var(--line);background:#080706;color:#cdb59b;font:7px var(--mono);text-transform:uppercase;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.ticket-actions button:hover,.ticket-actions button:focus-visible{border-color:var(--mint);background:rgba(220,154,103,.09);color:var(--mint)}
 .studio-label{display:block;margin:10px 0 6px;color:#c9a27e;font:8px var(--mono);letter-spacing:.1em}
 .studio-card select{width:100%;padding:10px;border:1px solid var(--line);background:#080706;color:var(--ink);font:10px var(--sans)}
 .studio-action{align-self:flex-start;margin-top:10px;padding:10px 13px;border:1px solid var(--mint);background:var(--mint);color:#1b130e;font:8px var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}

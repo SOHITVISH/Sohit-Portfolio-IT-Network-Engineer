@@ -219,11 +219,14 @@ terminalDialog?.querySelectorAll('[data-terminal-command]').forEach((button) => 
 });
 
 const terminalCommands = {
-  help: 'Available commands:\n  about                  who is Sohit?\n  projects               list selected work\n  project 1–6            open a project preview\n  skills                 show core capabilities\n  open projects/contact  jump to a section\n  resume                 open the PDF in a new tab\n  contact                show public contact details\n  clear · exit',
+  help: 'Available commands:\n  about                  who is Sohit?\n  projects               list selected work\n  project 1–6            open a project preview\n  skills                 show core capabilities\n  systems                servers, AD, and remote access\n  telecom                phones, EPABX, and PA\n  tools                  troubleshooting toolkit\n  ticket                 open the sample ticket workflow\n  open projects/contact  jump to a section\n  resume                 open the PDF in a new tab\n  contact                show public contact details\n  clear · exit',
   about: 'Sohit Vishwakarma · Network & IT Infrastructure Engineer\nAirport operations, routing and switching, security, monitoring, and practical automation.\nBased in Lucknow, India · Open to relocation.',
   whoami: 'Sohit Vishwakarma · Network & IT Infrastructure Engineer\nLucknow, India · Open to relocation across India.',
   projects: 'SELECTED WORK\n01  Airport IT & Network Infrastructure\n02  PacketPath Networking Study Lab\n03  Fake Signature Detection\n04  React 360° Virtual Tour\n05  Cisco Routing & Automation Lab\n06  Network Monitoring Lab\nTip: type project 1 to open a detail preview.',
-  skills: 'ROUTING & SWITCHING · VLAN · OSPF · STP/RSTP\nFIREWALLS & VPN · SOPHOS HA · FORTIGATE\nMONITORING · WIRESHARK · ZABBIX · SOLARWINDS\nAUTOMATION · PYTHON · NETMIKO · NAPALM',
+  skills: 'L2/L3 SWITCH & ROUTER MANAGEMENT · VLAN · OSPF · STP/RSTP\nFIREWALLS & VPN · SOPHOS HA · FORTIGATE\nWINDOWS/LINUX SERVERS · ACTIVE DIRECTORY · GROUP POLICY\nTICKETING · SAT · CABLING · VENDOR COORDINATION',
+  systems: 'Windows Server · Linux (Ubuntu/CentOS) · Active Directory users/groups · Group Policy · PowerShell · Bash · SSH/PuTTY remote access.',
+  telecom: 'Analog phones · IP phones · EPABX/telecom · public-address systems · ISP/vendor coordination and service troubleshooting.',
+  tools: 'Infron NMS · Zabbix · SolarWinds · Wireshark · Nmap · PuTTY · ping · traceroute · netstat · logs and CLI checks.',
   contact: 'EMAIL     isohitv@gmail.com\nLINKEDIN  linkedin.com/in/sohit-vishwakarma\nGITHUB    github.com/SOHITVISH',
   resume: 'Opening the résumé PDF in a new tab…',
   clear: '',
@@ -237,7 +240,11 @@ function runPortfolioCommand(rawCommand) {
   const projectMatch = command.match(/^(?:open )?project(?: | #)([1-6])$/);
   const sectionMatch = command.match(/^open (projects|work|contact|skills|story)$/);
   let response = terminalCommands[command];
-  if (projectMatch) {
+  if (command === 'ticket') {
+    terminalDialog?.close();
+    document.querySelector('.ticket-demo')?.scrollIntoView({ behavior: motionEnabled ? 'smooth' : 'auto' });
+    response = 'Opening the sample ticket workflow…';
+  } else if (projectMatch) {
     const projectIndex = Number(projectMatch[1]) - 1;
     terminalDialog?.close();
     requestAnimationFrame(() => document.querySelectorAll('.project-preview-trigger')[projectIndex]?.click());
@@ -337,17 +344,22 @@ document.querySelectorAll('.approach-accordion details').forEach((detail) => {
 });
 
 const demoResponses = {
-  'help': 'Supported demo commands:\nshow ip route\nshow vlan brief\nshow ip ospf neighbor\nshow spanning-tree\nping 198.51.100.20\nwhoami\nabout sohit\nshow achievements\nshow certifications\nsudo hire sohit',
+  'help': 'Supported demo commands:\nshow ip route\nshow ip interface brief\nshow interfaces status\nshow mac address-table\nshow vlan brief\nshow ip ospf neighbor\nshow spanning-tree\nping 198.51.100.20\ntraceroute 198.51.100.20\ncheck firewall path\nwhoami\nabout sohit\nshow achievements\nshow certifications\nsudo hire sohit',
   'whoami': 'Sohit Vishwakarma\nNetwork & IT Infrastructure Engineer\nLucknow, India · Open to relocation across India',
   'about sohit': 'Network operations · Airport infrastructure · Application support\nI work across reliability, security, monitoring, and practical automation.',
   'show achievements': '20+ Cisco Catalyst switches supported\n55+ Ruckus wireless APs supported\n50+ Wipro backend incidents/month · 95%+ SLA adherence\n99%+ reported uptime across supported key services',
   'show certifications': 'Sophos Certified Network Engineer · 2025\nFortiGate Administrator · Fortinet · 2026\nCCNA networking coursework · in progress\nCisco / Google / IBM training listed in Learning',
   'sudo hire sohit': 'This read-only portfolio terminal cannot run privileged commands.\nTo start a conversation, use the public email link on this page.',
   'show ip route': 'C  192.0.2.0/24       directly connected, Vlan10\nS  198.51.100.0/24   via 192.0.2.1\nS* 0.0.0.0/0         via 192.0.2.1\n\nSIMULATED ROUTING TABLE · DOCUMENTATION RANGES',
+  'show ip interface brief': 'Interface       IP-Address      Status  Protocol\nVlan10          192.0.2.2       up      up\nGi0/1           unassigned      up      up\nGi0/2           unassigned      up      up\n\nSYNTHETIC INTERFACE SUMMARY · LAB ONLY',
+  'show interfaces status': 'Port    Name       Status       VLAN  Type\nGi0/1   UPLINK     connected    trunk 1G\nGi0/2   USERS      connected    20    1G\nGi0/3   SPARE      notconnect   1     1G\n\nSIMULATED SWITCH STATE · NOT A LIVE DEVICE',
+  'show mac address-table': 'VLAN  MAC Address       Type      Port\n10    00aa.10bb.20cc    DYNAMIC   Gi0/1\n20    00dd.30ee.40ff    DYNAMIC   Gi0/2\n\nSYNTHETIC MAC TABLE · SAMPLE VALUES',
   'show vlan brief': 'VLAN  Name       Status\n10    MGMT       active\n20    USERS      active\n30    LAB        active\n\nSYNTHETIC VLAN EXAMPLE · NO SITE DATA',
   'show ip ospf neighbor': 'Neighbor ID     State     Interface\n198.51.100.2    FULL/DR   Gi0/1\n\nSYNTHETIC OSPF ADJACENCY · LAB ONLY',
   'show spanning-tree': 'VLAN0030\nRoot bridge: LAB-SW-01\nGi0/1  Root FWD  cost 4\nGi0/2  Desg FWD  cost 4\n\nSIMULATED STP STATE',
-  'ping 198.51.100.20': 'Sending 5 ICMP echoes to 198.51.100.20...\n!!!!!\nSuccess rate is 100 percent (5/5)\nRound-trip time: synthetic lab result'
+  'ping 198.51.100.20': 'Sending 5 ICMP echoes to 198.51.100.20...\n!!!!!\nSuccess rate is 100 percent (5/5)\nRound-trip time: synthetic lab result',
+  'traceroute 198.51.100.20': 'Tracing a sample path to 198.51.100.20\n1  192.0.2.1       1 ms\n2  192.0.2.254     3 ms\n3  198.51.100.20   5 ms\n\nSYNTHETIC PATH · DOCUMENTATION RANGES',
+  'check firewall path': 'SAMPLE FLOW · CLIENT VLAN 20 → POLICY LOOKUP → NAT CHECK → DESTINATION TEST\nReview source, destination, service, rule order, VPN/route state, and logs before escalation.\n\nADVISORY EXAMPLE · NO FIREWALL CONTACTED'
 };
 
 const consoleOutput = document.querySelector('#console-output');
@@ -476,6 +488,34 @@ const studioTriage = {
   cctv: 'Check the camera path and switch port; review PoE and link status; confirm VLAN reachability and VMS registration in a lab example.',
   fids: 'Check the display endpoint and application health; trace DNS and network reachability; compare timestamps and upstream service status.'
 };
+
+const ticketStatus = document.querySelector('#ticket-status');
+const ticketQueue = document.querySelector('#ticket-queue');
+const ticketOutput = document.querySelector('#ticket-output');
+document.querySelectorAll('[data-ticket-action]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const action = button.dataset.ticketAction;
+    const states = {
+      acknowledge: ['ACKNOWLEDGED · P2', 'NETWORK SUPPORT', 'Ticket accepted · impact and affected service recorded; investigation assigned to the support queue.'],
+      investigate: ['IN PROGRESS · P2', 'NETWORK SUPPORT', 'Work note added · check interface and VLAN state, review NMS events, then verify the route and packet path. Sample evidence only.'],
+      escalate: ['VENDOR ESCALATION · P2', 'VENDOR COORDINATION', 'Escalation note added · share impact, checks completed, relevant timestamps, and the next action with the vendor; track follow-up to closure.'],
+      resolve: ['RESOLVED · P2', 'NETWORK SUPPORT', 'Resolution recorded · validate reachability and user service, attach the check result, and document the root cause before closure.'],
+      close: ['CLOSED · P2', 'NETWORK SUPPORT', 'Ticket closed · resolution, validation evidence, handoff, and final notes are recorded in this synthetic example.']
+    };
+    if (action === 'reset') {
+      if (ticketStatus) ticketStatus.textContent = 'OPEN · P2';
+      if (ticketQueue) ticketQueue.textContent = 'NETWORK SUPPORT';
+      if (ticketOutput) ticketOutput.textContent = 'New sample ticket · record the impact, then choose an action. No live ticketing system is connected.';
+      return;
+    }
+    const [status, queue, message] = states[action] || [];
+    if (!status) return;
+    if (ticketStatus) ticketStatus.textContent = status;
+    if (ticketQueue) ticketQueue.textContent = queue;
+    if (ticketOutput) ticketOutput.textContent = message;
+  });
+});
+
 document.querySelector('#triage-run')?.addEventListener('click', () => {
   const symptom = document.querySelector('#triage-symptom')?.value;
   const output = document.querySelector('#triage-output');
@@ -538,17 +578,20 @@ document.querySelector('#replay-run')?.addEventListener('click', () => {
 });
 
 const skillEvidence = {
-  routing: ['ROUTING & SWITCHING', 'Evidence: Cisco routing and automation lab; airport network support.', 'Cisco Catalyst · OSPF · VLAN · STP/RSTP'],
-  security: ['SECURITY & VPN', 'Evidence: Sophos HA, FortiGate administration, VPN, access controls.', 'Firewall · IPsec/SSL VPN · ACL · NAT'],
+  routing: ['ROUTING & SWITCHING', 'Evidence: Cisco routing and automation lab; support across access and distribution/core switch roles and routed paths.', 'L2/L3 switches · Routers · OSPF · VLAN · STP/RSTP'],
+  security: ['FIREWALLS & VPN', 'Evidence: Sophos HA, FortiGate administration, VPN, access controls, and security-log checks.', 'Sophos HA · FortiGate · IPsec/SSL VPN · ACL · NAT'],
   automation: ['NETWORK AUTOMATION', 'Evidence: EVE-NG practice and repeatable Python/Netmiko/NAPALM checks.', 'Python · Netmiko · NAPALM · Ansible'],
   cloud: ['CLOUD NETWORKING', 'Learning direction: AWS networking and cloud-connected infrastructure fundamentals.', 'AWS VPC · EC2 · S3 · IAM fundamentals'],
-  observability: ['OBSERVABILITY', 'Evidence: Zabbix monitoring lab and NOC troubleshooting workflows.', 'Infron NMS · Zabbix · Wireshark · SolarWinds'],
-  identity: ['IDENTITY & NAC', 'Evidence: Active Directory, Group Policy, directory services, and access systems.', 'Active Directory · GPO · access control'],
-  noc: ['NOC OPERATIONS', 'Evidence: 24/7 monitoring, incident scoping, escalation, recovery, and RCA.', 'Incident response · SLA · RCA'],
+  observability: ['TROUBLESHOOTING TOOLKIT', 'Evidence: use monitoring signals, path tests, logs, and packet inspection to isolate faults and verify recovery.', 'Infron NMS · Zabbix · SolarWinds · Wireshark · Nmap · ping · traceroute'],
+  switchmgmt: ['SWITCH MANAGEMENT', 'Evidence: hands-on operation and troubleshooting across L2 access and L3 distribution/core switch roles.', 'Cisco IOS CLI · PuTTY/SSH · VLAN · STP/RSTP · trunk checks'],
+  servers: ['SERVER MANAGEMENT', 'Evidence: Windows and Linux server administration, service and health checks, remote access, and operations support.', 'Windows Server · Linux · PowerShell · Bash · PuTTY/SSH'],
+  identity: ['ACTIVE DIRECTORY & GROUP POLICY', 'Evidence: directory users/groups, organizational units, Group Policy, and access support.', 'Active Directory · Users/Groups · OU · GPO'],
+  noc: ['TICKETING & NOC OPERATIONS', 'Evidence: ticket-based incident handling from impact and priority through work notes, escalation, validation, and closure.', 'Incident queue · updates · vendor handoff · resolution notes'],
+  field: ['CABLING, SAT & FIELD DELIVERY', 'Evidence: structured cabling and cable dressing, Site Acceptance Testing, commissioning checks, and vendor coordination through handover.', 'Cabling · SAT · commissioning · vendor follow-up'],
   iac: ['NETWORK AS CODE', 'Learning direction: versioned intent, reviewable changes, and repeatable configuration.', 'Git · YAML · Ansible · Python'],
   airport: ['AIRPORT IT SYSTEMS', 'Evidence: deployment and support for connected passenger-facing infrastructure.', 'Cisco · Ruckus · Sophos · FIDS'],
   surveillance: ['VIDEO SURVEILLANCE', 'Evidence: CCTV service support and DVR/NVR/VMS troubleshooting.', '300+ Honeywell cameras · DVR/NVR · VMS'],
-  telephony: ['PA & EPABX', 'Evidence: public-address and telephony service coordination.', 'PA · EPABX · service coordination'],
+  telephony: ['TELECOM & PHONE SYSTEMS', 'Evidence: support and coordination across analog and IP phone services, EPABX, public-address systems, and ISP dependencies.', 'Analog phones · IP phones · EPABX · PA'],
   isp: ['ISP & WAN OPERATIONS', 'Evidence: ISP coordination and LAN/WAN incident path checks.', 'WAN · VPN · routing · escalation']
 };
 document.querySelectorAll('.skill-options [data-skill]').forEach((button) => {
